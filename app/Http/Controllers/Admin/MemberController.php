@@ -149,7 +149,7 @@ class MemberController extends Controller
     }
 
     /**
-     * Generate QR Code for member.
+     * Redirect to attendance scanner.
      */
     public function generateQrCode(User $member)
     {
@@ -157,14 +157,6 @@ class MemberController extends Controller
             abort(404);
         }
 
-        // Simuler la génération de QR Code
-        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . 
-                    urlencode(json_encode([
-                        'user_id' => $member->id,
-                        'name' => $member->full_name,
-                        'email' => $member->email,
-                    ]));
-
-        return view('admin.members.qr-code', compact('member', 'qrCodeUrl'));
+        return redirect()->route('admin.attendance.index')->with('info', 'Consultez la page des présences pour gérer les entrées/sorties.');
     }
 }

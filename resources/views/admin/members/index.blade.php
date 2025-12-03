@@ -182,8 +182,8 @@
                                     <a href="{{ route('admin.members.edit', $member) }}" class="text-green-600 hover:text-green-900" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{{ route('admin.attendance.scanner', ['member_id' => $member->id]) }}" class="text-purple-600 hover:text-purple-900" title="Scanner présence">
-                                        <i class="fas fa-qrcode"></i>
+                                    <a href="{{ route('admin.attendance.record', ['member_id' => $member->id]) }}" class="text-purple-600 hover:text-purple-900" title="Enregistrer présence">
+                                        <i class="fas fa-door-open"></i>
                                     </a>
                                     <form action="{{ route('admin.members.destroy', $member) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce membre ?');">
                                         @csrf

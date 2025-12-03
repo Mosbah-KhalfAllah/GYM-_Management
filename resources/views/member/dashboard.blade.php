@@ -46,7 +46,7 @@
                     </p>
                 </div>
                 <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-qrcode text-2xl text-blue-600"></i>
+                    <i class="fas fa-door-open text-2xl text-blue-600"></i>
                 </div>
             </div>
         </div>
@@ -276,10 +276,6 @@
             <div class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl shadow-lg p-6 text-white">
                 <h3 class="text-lg font-semibold mb-4">Actions Rapides</h3>
                 <div class="space-y-3">
-                    <a href="{{ route('member.qrcode') }}" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
-                        <span class="font-medium">Mon QR Code</span>
-                        <i class="fas fa-qrcode"></i>
-                    </a>
                     <a href="{{ route('member.attendance.index') }}" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
                         <span class="font-medium">Mes Présences</span>
                         <i class="fas fa-history"></i>
@@ -340,7 +336,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $attendance->entry_method === 'qr_code' ? 'QR Code' : 'Manuel' }}
+                                {{ $attendance->entry_method === 'qr_code' ? 'Scanner' : 'Manuel' }}
                             </td>
                         </tr>
                     @endforeach

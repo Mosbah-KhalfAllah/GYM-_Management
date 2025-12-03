@@ -35,7 +35,7 @@
                     </p>
                 </div>
                 <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
-                    <i class="fas fa-qrcode text-2xl"></i>
+                    <i class="fas fa-door-open text-2xl"></i>
                 </div>
             </div>
         </div>
@@ -153,7 +153,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                         {{ $attendance->entry_method === 'qr_code' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
-                                        {{ $attendance->entry_method === 'qr_code' ? 'QR Code' : 'Manuel' }}
+                                        {{ $attendance->entry_method === 'qr_code' ? 'Scanner' : 'Manuel' }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -179,9 +179,9 @@
                 <i class="fas fa-user-plus text-2xl mb-2"></i>
                 <span class="font-medium">Ajouter un membre</span>
             </a>
-            <a href="{{ route('admin.attendance.scanner') }}" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-4 flex flex-col items-center justify-center transition-all duration-200 transform hover:-translate-y-1">
-                <i class="fas fa-qrcode text-2xl mb-2"></i>
-                <span class="font-medium">Scanner QR Code</span>
+            <a href="{{ route('admin.attendance.record') }}" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-4 flex flex-col items-center justify-center transition-all duration-200 transform hover:-translate-y-1">
+                <i class="fas fa-door-open text-2xl mb-2"></i>
+                <span class="font-medium">Scanner Présence</span>
             </a>
             <a href="{{ route('admin.classes.create') }}" class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-4 flex flex-col items-center justify-center transition-all duration-200 transform hover:-translate-y-1">
                 <i class="fas fa-calendar-plus text-2xl mb-2"></i>

@@ -239,13 +239,13 @@
                 <p class="text-gray-600">Planifiez un nouveau cours collectif</p>
             </div>
         </a>
-        <a href="{{ route('coach.attendance.scanner') }}" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 border border-gray-200 hover:border-blue-300">
+        <a href="{{ route('coach.attendance.record') }}" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 border border-gray-200 hover:border-blue-300">
             <div class="flex flex-col items-center text-center">
                 <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white mb-4">
-                    <i class="fas fa-qrcode text-2xl"></i>
+                    <i class="fas fa-door-open text-2xl"></i>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-800 mb-2">Scanner Présence</h3>
-                <p class="text-gray-600">Scanner les QR codes pour enregistrer les présences</p>
+                <p class="text-gray-600">Gérez les présences et les scanner</p>
             </div>
         </a>
     </div>

@@ -6,21 +6,21 @@
 <div class="max-w-2xl mx-auto p-6">
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <h1 class="text-3xl font-bold mb-2">Scanner de présence</h1>
-        <p class="text-gray-600">Scannez le QR Code du membre pour enregistrer son entrée/sortie</p>
+        <p class="text-gray-600">Enregistrez l'entrée/sortie des membres</p>
     </div>
 
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <h2 class="font-semibold text-blue-900 mb-2">📷 Comment utiliser la caméra:</h2>
         <ol class="list-decimal list-inside text-sm text-blue-800 space-y-1">
             <li>Acceptez l'accès à la caméra quand demandé</li>
-            <li>Pointez la caméra vers le QR Code du membre</li>
+            <li>Pointez la caméra vers le code du membre</li>
             <li>Attendez que le code soit détecté automatiquement</li>
             <li>L'entrée/sortie sera enregistrée automatiquement</li>
         </ol>
     </div>
 
     <div class="bg-white rounded-lg shadow p-6">
-        <p class="text-gray-600 mb-4">Vous pouvez aussi coller les données QR JSON ci-dessous si la caméra ne fonctionne pas.</p>
+        <p class="text-gray-600 mb-4">Vous pouvez aussi coller les données du code JSON ci-dessous si la caméra ne fonctionne pas.</p>
 
         <div id="scannerArea" class="mb-4">
             <div class="bg-gray-900 rounded border-2 border-gray-700 overflow-hidden" style="max-width: 500px; margin: 0 auto;">
@@ -34,8 +34,8 @@
 
         <div class="mb-4">
             <form id="pasteForm">
-                <label class="block text-sm font-medium text-gray-700 mb-2">💾 Ou collez les données QR (JSON):</label>
-                <textarea id="qrDataInput" name="qr_data" rows="4" class="mt-1 block w-full border rounded p-2 text-xs" placeholder='Collez ici le contenu JSON du QR Code'></textarea>
+                <label class="block text-sm font-medium text-gray-700 mb-2">💾 Ou collez les données du membre:</label>
+                <textarea id="qrDataInput" name="qr_data" rows="4" class="mt-1 block w-full border rounded p-2 text-xs" placeholder='Collez ici le contenu JSON du code'></textarea>
                 <div class="mt-2">
                     <button id="pasteSubmit" type="button" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Soumettre</button>
                 </div>

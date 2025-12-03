@@ -52,7 +52,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     
     // Members
     Route::resource('members', \App\Http\Controllers\Admin\MemberController::class);
-    Route::get('members/{member}/qr-code', [\App\Http\Controllers\Admin\MemberController::class, 'generateQrCode'])->name('members.qr-code');
+    Route::get('members/{member}/attendance', [\App\Http\Controllers\Admin\MemberController::class, 'generateQrCode'])->name('members.attendance');
     
     // Coaches
     Route::resource('coaches', \App\Http\Controllers\Admin\CoachController::class);
@@ -65,8 +65,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     
     // Attendance
     Route::get('attendance', [\App\Http\Controllers\Admin\AttendanceController::class, 'index'])->name('attendance.index');
-    Route::get('attendance/scanner', [\App\Http\Controllers\Admin\AttendanceController::class, 'scanner'])->name('attendance.scanner');
-    Route::post('attendance/scan', [\App\Http\Controllers\Admin\AttendanceController::class, 'scan'])->name('attendance.scan');
+    Route::get('attendance/record', [\App\Http\Controllers\Admin\AttendanceController::class, 'showRecord'])->name('attendance.record');
+    Route::post('attendance/record', [\App\Http\Controllers\Admin\AttendanceController::class, 'record'])->name('attendance.record');
+    Route::get('api/members/search', [\App\Http\Controllers\Admin\AttendanceController::class, 'searchMembers'])->name('api.members.search');
     
     // Equipment
     Route::resource('equipment', \App\Http\Controllers\Admin\EquipmentController::class);
@@ -118,7 +119,7 @@ Route::prefix('coach')->name('coach.')->middleware(['auth'])->group(function () 
     
     // Attendance
     Route::get('attendance', [\App\Http\Controllers\Coach\AttendanceController::class, 'index'])->name('attendance.index');
-    Route::get('attendance/scanner', [\App\Http\Controllers\Coach\AttendanceController::class, 'scanner'])->name('attendance.scanner');
+    Route::get('attendance/record', [\App\Http\Controllers\Coach\AttendanceController::class, 'record'])->name('attendance.record');
     Route::post('attendance/scan', [\App\Http\Controllers\Coach\AttendanceController::class, 'scan'])->name('attendance.scan');
     Route::post('attendance/{attendance}/checkout', [\App\Http\Controllers\Coach\AttendanceController::class, 'checkout'])->name('attendance.checkout');
     Route::post('attendance/member/{member}/checkin', [\App\Http\Controllers\Coach\AttendanceController::class, 'forceCheckIn'])->name('attendance.force-checkin');
@@ -166,10 +167,10 @@ Route::prefix('member')->name('member.')->middleware(['auth'])->group(function (
     Route::get('profile', [\App\Http\Controllers\Member\ProfileController::class, 'index'])->name('profile.index');
     Route::put('profile', [\App\Http\Controllers\Member\ProfileController::class, 'update'])->name('profile.update');
     
-    // QR Code
-    Route::get('qrcode', [\App\Http\Controllers\Member\QrCodeController::class, 'show'])->name('qrcode');
-    Route::get('qrcode/download', [\App\Http\Controllers\Member\QrCodeController::class, 'download'])->name('qrcode.download');
-    Route::post('qrcode/regenerate', [\App\Http\Controllers\Member\QrCodeController::class, 'regenerate'])->name('qrcode.regenerate');
+    // Attendance (Self-service check-in)
+    Route::get('attendance/qrcode', [\App\Http\Controllers\Member\QrCodeController::class, 'show'])->name('member.attendance');
+    // Toggle attendance (replaces QR check-in flow)
+    Route::post('attendance/toggle', [\App\Http\Controllers\Member\AttendanceController::class, 'toggle'])->name('attendance.toggle');
 });
 
 // Autres pages publiques

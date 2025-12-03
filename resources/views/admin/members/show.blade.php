@@ -18,9 +18,9 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.members.qr-code', $member) }}" class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center gap-2">
-                <i class="fas fa-qrcode"></i>
-                QR Code
+            <a href="{{ route('admin.attendance.index') }}" class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center gap-2">
+                <i class="fas fa-door-open"></i>
+                Présences
             </a>
             <a href="{{ route('admin.members.edit', $member) }}" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center gap-2">
                 <i class="fas fa-edit"></i>
@@ -153,7 +153,7 @@
                                 </div>
                                 <span class="px-2 py-1 text-xs rounded-full 
                                     {{ $attendance->entry_method === 'qr_code' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
-                                    {{ $attendance->entry_method === 'qr_code' ? 'QR Code' : 'Manuel' }}
+                                    {{ $attendance->entry_method === 'qr_code' ? 'Scanner' : 'Manuel' }}
                                 </span>
                             </div>
                         @endforeach
@@ -218,8 +218,8 @@
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Actions rapides</h2>
                 <div class="space-y-3">
-                    <a href="{{ route('admin.attendance.scanner', ['member_id' => $member->id]) }}" class="block w-full px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-center font-medium">
-                        <i class="fas fa-qrcode mr-2"></i>
+                    <a href="{{ route('admin.attendance.record', ['member_id' => $member->id]) }}" class="block w-full px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-center font-medium">
+                        <i class="fas fa-door-open mr-2"></i>
                         Scanner présence
                     </a>
                     <a href="#" class="block w-full px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-center font-medium">

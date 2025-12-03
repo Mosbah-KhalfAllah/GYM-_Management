@@ -107,4 +107,38 @@ class AttendanceController extends Controller
             'date'
         ));
     }
+
+    /**
+     * Toggle attendance for the authenticated member.
+     * If there is an active attendance (no check_out) today, it will check out.
+     * Otherwise it will create a new check_in.
+     */
+    public function toggle(Request $request)
+    {
+        $user = Auth::user();
+
+        // Find active attendance for today
+        $active = Attendance::where('user_id', $user->id)
+            ->whereNull('check_out')
+            ->whereDate('check_in', today())
+            ->first();
+
+        if ($active) {
+            $active->update([
+                'check_out' => now(),
+                'duration_minutes' => $active->check_in->diffInMinutes(now()),
+                'entry_method' => 'manual',
+            ]);
+
+            return redirect()->back()->with('success', 'Sortie enregistrée.');
+        }
+
+        Attendance::create([
+            'user_id' => $user->id,
+            'check_in' => now(),
+            'entry_method' => 'manual',
+        ]);
+
+        return redirect()->back()->with('success', 'Entrée enregistrée.');
+    }
 }

@@ -40,11 +40,11 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Display the scanner page.
+     * Display the record page.
      */
-    public function scanner()
+    public function record()
     {
-        return view('coach.attendance.scanner');
+        return view('coach.attendance.record');
     }
 
     /**

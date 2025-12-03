@@ -36,8 +36,8 @@
                     <span>Cours collectifs</span>
                 </a><br>
                 <a href="{{ route('admin.attendance.index') }}" class="sidebar-item {{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}">
-                    <i class="fas fa-qrcode"></i>
-                    <span>Présences QR</span>
+                    <i class="fas fa-door-open"></i>
+                    <span>Présences</span>
                 </a><br>
                 <a href="{{ route('admin.equipment.index') }}" class="sidebar-item {{ request()->routeIs('admin.equipment.*') ? 'active' : '' }}">
                     <i class="fas fa-dumbbell"></i>
@@ -80,8 +80,8 @@
                     <span>Mes Cours</span>
                 </a><br>
                 <a href="{{ route('coach.attendance.index') }}" class="sidebar-item {{ request()->routeIs('coach.attendance.*') ? 'active' : '' }}">
-                    <i class="fas fa-qrcode"></i>
-                    <span>Scanner présence</span>
+                    <i class="fas fa-door-open"></i>
+                    <span>Présences</span>
                 </a><br>
                 <a href="{{ route('coach.exercises.index') }}" class="sidebar-item {{ request()->routeIs('coach.exercises.*') ? 'active' : '' }}">
                     <i class="fas fa-dumbbell"></i>
@@ -126,10 +126,6 @@
                 <a href="{{ route('member.profile.index') }}" class="sidebar-item {{ request()->routeIs('member.profile.*') ? 'active' : '' }}">
                     <i class="fas fa-user-circle"></i>
                     <span>Mon Profil</span>
-                </a>
-                <a href="{{ route('member.qrcode') }}" class="sidebar-item {{ request()->routeIs('member.qrcode') ? 'active' : '' }}">
-                    <i class="fas fa-qrcode"></i>
-                    <span>Mon QR Code</span>
                 </a>
             </div>
         @endif
