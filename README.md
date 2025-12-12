@@ -188,12 +188,6 @@ MAIL_HOST=your_smtp_host
 MAIL_PORT=587
 ```
 
-### Tâches Cron (optionnel)
-```bash
-# Ajouter au crontab pour les tâches automatiques
-* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
-```
-
 ## 📈 Fonctionnalités Avancées
 
 ### Rapports et Analytics
@@ -228,9 +222,7 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 ## 📞 Support
 
 Pour toute question ou support :
-- 📧 Email : support@gym-management.com
-- 🐛 Issues : [GitHub Issues](https://github.com/votre-username/gym-management/issues)
-- 📖 Documentation : [Wiki](https://github.com/votre-username/gym-management/wiki)
+- 📧 Email : mosbah.khalfallah@isimg.tn
 
 ---
 
