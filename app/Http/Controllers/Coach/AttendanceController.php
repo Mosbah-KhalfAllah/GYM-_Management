@@ -48,7 +48,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Process QR code scan for attendance.
+     * Process QR code for attendance recording.
      */
     public function scan(Request $request)
     {
@@ -200,5 +200,106 @@ class AttendanceController extends Controller
         ]);
 
         return back()->with('success', 'Entrée forcée enregistrée pour ' . $member->full_name);
+    }
+
+    /**
+     * Manual attendance recording (like admin interface)
+     */
+    public function recordManual(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'action' => 'required|in:check_in,check_out'
+        ]);
+
+        $coachId = auth()->id();
+        $user = User::find($validated['user_id']);
+
+        // Verify assignment
+        $isAssigned = $user->programs()
+            ->where('coach_id', $coachId)
+            ->wherePivot('status', 'active')
+            ->exists();
+
+        if (!$isAssigned) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Ce membre n\'est pas assigné à votre supervision.'
+            ]);
+        }
+
+        if ($validated['action'] === 'check_in') {
+            // Check for existing active attendance today
+            $active = Attendance::where('user_id', $user->id)
+                ->whereNull('check_out')
+                ->whereDate('check_in', today())
+                ->first();
+
+            if ($active) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Le membre a déjà une entrée active aujourd\'hui.'
+                ]);
+            }
+
+            $attendance = Attendance::create([
+                'user_id' => $user->id,
+                'check_in' => now(),
+                'entry_method' => 'manual',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Entrée enregistrée pour ' . $user->full_name,
+                'check_in' => $attendance->check_in->format('H:i')
+            ]);
+        } else {
+            // Check out
+            $attendance = Attendance::where('user_id', $user->id)
+                ->whereNull('check_out')
+                ->whereDate('check_in', today())
+                ->first();
+
+            if (!$attendance) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Aucune entrée active trouvée pour ce membre aujourd\'hui.'
+                ]);
+            }
+
+            $attendance->update([
+                'check_out' => now(),
+                'duration_minutes' => $attendance->check_in->diffInMinutes(now()),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sortie enregistrée pour ' . $user->full_name,
+                'check_out' => $attendance->check_out->format('H:i')
+            ]);
+        }
+    }
+
+    /**
+     * Search members assigned to coach
+     */
+    public function searchMembers(Request $request)
+    {
+        $query = $request->get('q', '');
+        $coachId = auth()->id();
+
+        $members = User::whereHas('programs', function ($q) use ($coachId) {
+            $q->where('coach_id', $coachId);
+        })
+        ->where(function ($q) use ($query) {
+            $q->where('first_name', 'like', '%' . $query . '%')
+              ->orWhere('last_name', 'like', '%' . $query . '%')
+              ->orWhere('email', 'like', '%' . $query . '%');
+        })
+        ->select('id', 'first_name', 'last_name', 'email')
+        ->limit(10)
+        ->get();
+
+        return response()->json($members);
     }
 }

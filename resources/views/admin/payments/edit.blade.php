@@ -43,12 +43,12 @@
                     <div class="grid grid-cols-2 gap-4">
                         <x-form-field
                             name="amount"
-                            label="Montant (€)"
+                            label="Montant (DT)"
                             type="number"
                             placeholder="50.00"
                             :required="true"
                             step="0.01"
-                            min="0.01"
+                            min="0"
                             max="999999.99"
                             :error="$errors->first('amount')"
                             :value="old('amount', $payment->amount)"
@@ -61,7 +61,7 @@
                             :error="$errors->first('currency')"
                             :value="old('currency', $payment->currency)"
                         >
-                            <option value="EUR">EUR (€)</option>
+                            <option value="TND">TND (DT)</option>
                             <option value="USD">USD ($)</option>
                         </x-form-field>
                     </div>
@@ -74,9 +74,9 @@
                         :error="$errors->first('payment_method')"
                         :value="old('payment_method', $payment->payment_method)"
                     >
-                        <option value="cash">Espèces</option>
-                        <option value="card">Carte bancaire</option>
-                        <option value="online">Paiement en ligne</option>
+                        <option value="cash" {{ old('payment_method', $payment->payment_method) == 'cash' ? 'selected' : '' }}>Espèces</option>
+                        <option value="card" {{ old('payment_method', $payment->payment_method) == 'card' ? 'selected' : '' }}>Carte bancaire</option>
+                        <option value="online" {{ old('payment_method', $payment->payment_method) == 'online' ? 'selected' : '' }}>Paiement en ligne</option>
                     </x-form-field>
                     
                     <x-form-field

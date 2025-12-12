@@ -84,7 +84,7 @@
                 </a>
             </div>
             <div class="space-y-4">
-                @foreach($upcomingClasses as $class)
+                @forelse($upcomingClasses as $class)
                     <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-4">
@@ -101,23 +101,32 @@
                             </div>
                             <div class="text-right">
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
-                                    {{ $class->registered_count >= $class->capacity ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                                    {{ ($class->bookings_count ?? 0) >= $class->capacity ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
                                     <i class="fas fa-users mr-1"></i>
-                                    {{ $class->registered_count }}/{{ $class->capacity }}
+                                    {{ $class->bookings_count ?? 0 }}/{{ $class->capacity }}
                                 </span>
                                 <p class="text-sm text-gray-600 mt-2">{{ $class->duration_minutes }} min</p>
                             </div>
                         </div>
                         <div class="mt-4 pt-4 border-t border-gray-100">
                             <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">{{ $class->description }}</span>
+                                <span class="text-sm text-gray-600">{{ Str::limit($class->description, 60) }}</span>
                                 <a href="{{ route('coach.classes.show', $class) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                     Voir détails
                                 </a>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="text-center py-8">
+                        <div class="text-4xl mb-3">📅</div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">Aucun cours planifié</h4>
+                        <p class="text-gray-600 mb-4">Commencez par créer votre premier cours.</p>
+                        <a href="{{ route('coach.classes.create') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            <i class="fas fa-plus mr-2"></i>Créer un cours
+                        </a>
+                    </div>
+                @endforelse
             </div>
         </div>
 
@@ -244,8 +253,8 @@
                 <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white mb-4">
                     <i class="fas fa-door-open text-2xl"></i>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">Scanner Présence</h3>
-                <p class="text-gray-600">Gérez les présences et les scanner</p>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Enregistrer Présence</h3>
+                <p class="text-gray-600">Enregistrez les présences manuellement</p>
             </div>
         </a>
     </div>

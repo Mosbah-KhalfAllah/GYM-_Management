@@ -3,305 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYM Management - Système de gestion de salle de sport</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>GYM PRO - Système de gestion de salle de sport</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .gradient-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-secondary { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .gradient-accent { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .text-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-10px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .fade-in { animation: fadeIn 1s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .blob { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; animation: blob 7s ease-in-out infinite; }
+        @keyframes blob { 0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; } 25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; } 50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; } 75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; } }
+    </style>
 </head>
-<body class="font-sans bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+<body class="bg-white">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <div class="h-10 w-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-dumbbell text-white text-xl"></i>
-                        </div>
-                        <span class="ml-3 text-2xl font-bold text-gray-900">GYM PRO</span>
-                    </div>
-                </div>
+    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-sm shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('inquiry.create') }}" class="inline-flex items-center px-4 py-2 border border-blue-500 text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-all duration-200">
-                        <i class="fas fa-question-circle mr-2"></i>
-                        Renseignements
+                    <div class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-dumbbell text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">GYM <span class="text-gradient">PRO</span></span>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="{{ route('inquiry.create') }}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                        Contact
                     </a>
-                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
-                        <i class="fas fa-sign-in-alt mr-2"></i>
-                        Se connecter
+                    <a href="{{ route('login') }}" class="px-6 py-3 gradient-primary text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300">
+                        Connexion
                     </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Message de succès -->
-    @if(session('inquiry_success'))
-        <div id="inquiry-alert" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 transition-opacity duration-500">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle mr-3 text-lg"></i>
-                    <p class="font-medium">{{ session('inquiry_success') }}</p>
-                </div>
-                <button onclick="closeAlert()" class="text-green-700 hover:text-green-900">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-        <script>
-            function closeAlert() {
-                const alert = document.getElementById('inquiry-alert');
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 500);
-            }
-            setTimeout(closeAlert, 5000);
-        </script>
-    @endif
-
     <!-- Hero Section -->
-    <div class="relative overflow-hidden">
+    <section class="pt-32 pb-20 px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
-            <div class="relative z-10 pb-8 bg-transparent sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-                <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-                    <div class="sm:text-center lg:text-left">
-                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                            <span class="block">Gérez votre salle</span>
-                            <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">de sport efficacement</span>
-                        </h1>
-                        <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                            Système complet de gestion de salle de sport avec QR codes, programmes personnalisés, cours collectifs et suivi des performances.
-                        </p>
-                        <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                            <div class="rounded-md shadow">
-                                <a href="{{ route('login') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 md:py-4 md:text-lg md:px-10 transition-all duration-200">
-                                    <i class="fas fa-play-circle mr-2"></i>
-                                    Démarrer maintenant
-                                </a>
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="fade-in">
+                    <h1 class="text-5xl lg:text-7xl font-black text-gray-900 leading-tight mb-8">
+                        Gérez votre
+                        <span class="text-gradient block">Salle de Sport</span>
+                        en toute simplicité
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-10 leading-relaxed">
+                        Solution complète pour la gestion des membres, paiements, cours et équipements. 
+                        Interface moderne et intuitive pour optimiser votre business.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-8 py-4 gradient-primary text-white font-semibold rounded-xl hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-rocket mr-3"></i>
+                            Commencer maintenant
+                        </a>
+                        <a href="#features" class="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-gray-400 transition-all duration-300">
+                            <i class="fas fa-play mr-3"></i>
+                            Découvrir
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-0 gradient-accent opacity-20 blob"></div>
+                    <div class="relative bg-white rounded-3xl shadow-2xl p-8">
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 gradient-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-chart-line text-white text-3xl"></i>
                             </div>
-                            <div class="mt-3 sm:mt-0 sm:ml-3">
-                                <a href="#features" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 md:py-4 md:text-lg md:px-10 transition-all duration-200">
-                                    <i class="fas fa-info-circle mr-2"></i>
-                                    En savoir plus
-                                </a>
+                            <h3 class="text-2xl font-bold text-gray-900">Dashboard Admin</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-users text-blue-600"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-700">Membres actifs</span>
+                                </div>
+                                <span class="text-2xl font-bold text-gray-900">247</span>
+                            </div>
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-money-bill text-green-600"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-700">Revenus mensuel</span>
+                                </div>
+                                <span class="text-2xl font-bold text-gray-900">12,450 DT</span>
+                            </div>
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-calendar text-purple-600"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-700">Cours aujourd'hui</span>
+                                </div>
+                                <span class="text-2xl font-bold text-gray-900">8</span>
                             </div>
                         </div>
                     </div>
-                </main>
-            </div>
-        </div>
-        <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-            <div class="h-56 w-full bg-gradient-to-r from-blue-500 to-purple-600 sm:h-72 md:h-96 lg:w-full lg:h-full rounded-l-3xl">
-                <div class="h-full w-full flex items-center justify-center p-8">
-                    <div class="text-white text-center">
-                        <i class="fas fa-dumbbell text-8xl mb-4 opacity-80"></i>
-                        <h3 class="text-2xl font-bold">GYM Management Pro</h3>
-                        <p class="mt-2 opacity-90">Solution professionnelle</p>
-                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Features Section -->
-    <div id="features" class="py-12 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="lg:text-center">
-                <h2 class="text-base text-blue-600 font-semibold tracking-wide uppercase">Fonctionnalités</h2>
-                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                    Tout ce dont vous avez besoin
-                </p>
-                <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-                    Un système complet pour gérer tous les aspects de votre salle de sport
-                </p>
-            </div>
-
-            <div class="mt-10">
-                <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-                    <!-- Feature 1 -->
-                    <div class="relative">
-                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="ml-16">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">Gestion des membres</h3>
-                            <p class="mt-2 text-base text-gray-500">
-                                Gérez les inscriptions, adhésions et présences de vos membres avec des QR codes uniques.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Feature 2 -->
-                    <div class="relative">
-                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-gradient-to-r from-green-500 to-green-600 text-white">
-                            <i class="fas fa-running"></i>
-                        </div>
-                        <div class="ml-16">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">Programmes personnalisés</h3>
-                            <p class="mt-2 text-base text-gray-500">
-                                Créez des programmes d'entraînement sur mesure avec suivi de progression.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Feature 3 -->
-                    <div class="relative">
-                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-                            <i class="fas fa-calendar-alt"></i>
-                        </div>
-                        <div class="ml-16">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">Cours collectifs</h3>
-                            <p class="mt-2 text-base text-gray-500">
-                                Planifiez et gérez les réservations de cours collectifs avec système de QR codes.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Feature 4 -->
-                    <div class="relative">
-                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-                            <i class="fas fa-dumbbell"></i>
-                        </div>
-                        <div class="ml-16">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">Équipements & Maintenance</h3>
-                            <p class="mt-2 text-base text-gray-500">
-                                Suivez l'état des équipements et planifiez les maintenances préventives.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Testimonials -->
-    <div class="bg-gradient-to-r from-blue-50 to-purple-50 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h2 class="text-3xl font-extrabold text-gray-900">
-                    Utilisé par les meilleures salles
+    <section id="features" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black text-gray-900 mb-6">
+                    Fonctionnalités <span class="text-gradient">Complètes</span>
                 </h2>
-                <p class="mt-4 text-lg text-gray-600">
-                    Découvrez ce que disent nos clients
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Tous les outils nécessaires pour gérer efficacement votre salle de sport
                 </p>
             </div>
-            <div class="mt-10">
-                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    <!-- Testimonial 1 -->
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <div class="flex items-center mb-4">
-                            <div class="flex-shrink-0">
-                                <div class="h-12 w-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                                    JD
-                                </div>
-                            </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold text-gray-900">Jean Dupont</h4>
-                                <p class="text-gray-600">Propriétaire, Fitness Center</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-700">
-                            "Ce système a révolutionné la gestion de ma salle. Les QR codes pour les présences sont géniaux !"
-                        </p>
-                    </div>
 
-                    <!-- Testimonial 2 -->
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <div class="flex items-center mb-4">
-                            <div class="flex-shrink-0">
-                                <div class="h-12 w-12 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
-                                    MS
-                                </div>
-                            </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold text-gray-900">Marie Simon</h4>
-                                <p class="text-gray-600">Coach, Power Gym</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-700">
-                            "Les programmes personnalisés et le suivi des progrès ont vraiment boosté la motivation de mes clients."
-                        </p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-2xl p-8 card-hover">
+                    <div class="w-16 h-16 gradient-primary rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-white text-2xl"></i>
                     </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Gestion des Membres</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Inscriptions, profils complets, suivi des adhésions et historique des présences.
+                    </p>
+                </div>
 
-                    <!-- Testimonial 3 -->
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <div class="flex items-center mb-4">
-                            <div class="flex-shrink-0">
-                                <div class="h-12 w-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                                    PL
-                                </div>
-                            </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold text-gray-900">Paul Leroy</h4>
-                                <p class="text-gray-600">Membre premium</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-700">
-                            "L'application est géniale ! Je peux suivre mes progrès et réserver mes cours en quelques clics."
-                        </p>
+                <div class="bg-white rounded-2xl p-8 card-hover">
+                    <div class="w-16 h-16 gradient-secondary rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-credit-card text-white text-2xl"></i>
                     </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Système de Paiements</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Gestion complète des transactions, méthodes multiples et rapports financiers.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 card-hover">
+                    <div class="w-16 h-16 gradient-accent rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-calendar-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Cours Collectifs</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Planification, réservations et gestion des coachs avec système intégré.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 card-hover">
+                    <div class="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-dumbbell text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Équipements</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Inventaire complet, suivi de maintenance et gestion des emplacements.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 card-hover">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-trophy text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Défis & Challenges</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Création de défis fitness, suivi des participations et système de récompenses.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 card-hover">
+                    <div class="w-16 h-16 bg-gradient-to-r from-pink-400 to-red-500 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-bar text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Analytics Avancés</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Tableaux de bord détaillés, statistiques et rapports pour optimiser votre business.
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 text-center">
+                <div class="fade-in">
+                    <div class="text-4xl font-black text-gradient mb-2">500+</div>
+                    <div class="text-gray-600 font-medium">Salles Équipées</div>
+                </div>
+                <div class="fade-in">
+                    <div class="text-4xl font-black text-gradient mb-2">50K+</div>
+                    <div class="text-gray-600 font-medium">Membres Actifs</div>
+                </div>
+                <div class="fade-in">
+                    <div class="text-4xl font-black text-gradient mb-2">99.9%</div>
+                    <div class="text-gray-600 font-medium">Uptime Garanti</div>
+                </div>
+                <div class="fade-in">
+                    <div class="text-4xl font-black text-gradient mb-2">24/7</div>
+                    <div class="text-gray-600 font-medium">Support Client</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- CTA Section -->
-    <div class="bg-gradient-to-r from-blue-500 to-purple-600">
-        <div class="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
-                <span class="block">Prêt à transformer votre salle ?</span>
+    <section class="py-20 gradient-primary">
+        <div class="max-w-4xl mx-auto text-center px-6 lg:px-8">
+            <h2 class="text-4xl font-black text-white mb-6">
+                Prêt à Transformer Votre Salle ?
             </h2>
-            <p class="mt-4 text-lg leading-6 text-blue-100">
-                Commencez gratuitement avec notre version de démonstration.
+            <p class="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+                Rejoignez les centaines de propriétaires qui font confiance à GYM PRO pour développer leur business.
             </p>
-            <a href="{{ route('login') }}" class="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 sm:w-auto transition-all duration-200 transform hover:-translate-y-0.5">
-                <i class="fas fa-rocket mr-2"></i>
-                Essayer maintenant
-            </a>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-semibold rounded-xl hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-rocket mr-3"></i>
+                    Démarrer Gratuitement
+                </a>
+                <a href="{{ route('inquiry.create') }}" class="inline-flex items-center justify-center px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-xl hover:bg-white/10 transition-all duration-300">
+                    <i class="fas fa-phone mr-3"></i>
+                    Nous Contacter
+                </a>
+            </div>
         </div>
-    </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-800">
-        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <div class="flex justify-center">
-                    <div class="h-12 w-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-dumbbell text-white text-xl"></i>
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-dumbbell text-white text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold">GYM <span class="text-blue-400">PRO</span></span>
+                    </div>
+                    <p class="text-gray-400 mb-6 max-w-md">
+                        Solution complète de gestion de salle de sport. Moderne, efficace et professionnel.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
                     </div>
                 </div>
-                <p class="mt-4 text-base text-gray-400">
-                    GYM Management Pro - Système complet de gestion de salle de sport
-                </p>
-                <p class="mt-2 text-sm text-gray-500">
-                    © {{ date('Y') }} Tous droits réservés.
-                </p>
-                <div class="mt-6">
-                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
-                        <i class="fas fa-sign-in-alt mr-2"></i>
-                        Accéder au système
-                    </a>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Produit</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Fonctionnalités</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Tarifs</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Sécurité</a></li>
+                    </ul>
                 </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="{{ route('inquiry.create') }}" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>© {{ date('Y') }} GYM PRO. Tous droits réservés.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Script -->
     <script>
-        // Smooth scrolling for anchor links
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
         });
 
-        // Animate elements on scroll
+        // Fade in animation on scroll
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -310,14 +308,17 @@
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-fade-in');
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
                 }
             });
         }, observerOptions);
 
-        // Observe feature cards
-        document.querySelectorAll('.relative').forEach(card => {
-            observer.observe(card);
+        document.querySelectorAll('.card-hover').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
         });
     </script>
 </body>

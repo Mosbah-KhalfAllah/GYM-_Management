@@ -50,6 +50,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::resource('members', \App\Http\Controllers\Admin\MemberController::class);
     Route::get('members/{member}/attendance', [\App\Http\Controllers\Admin\MemberController::class, 'generateQrCode'])->name('members.attendance');
     Route::get('members/{member}/quick-payment', [\App\Http\Controllers\Admin\PaymentController::class, 'create'])->name('members.quick-payment');
+    Route::post('members/search-by-phone', [\App\Http\Controllers\Admin\MemberController::class, 'searchByPhone'])->name('members.search-by-phone');
     
     // Coaches
     Route::resource('coaches', \App\Http\Controllers\Admin\CoachController::class);
@@ -76,6 +77,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::resource('payments', \App\Http\Controllers\Admin\PaymentController::class);
     Route::post('payments/quick', [\App\Http\Controllers\Admin\PaymentController::class, 'quickPayment'])->name('payments.quick');
     Route::get('members/{member}/payments', [\App\Http\Controllers\Admin\PaymentController::class, 'memberPayments'])->name('members.payments');
+    Route::patch('payments/{payment}/accept', [\App\Http\Controllers\Admin\PaymentController::class, 'accept'])->name('payments.accept');
     Route::get('payments-help', function() { return view('admin.payments.help'); })->name('payments.help');
     
     // Challenges
@@ -124,6 +126,8 @@ Route::prefix('coach')->name('coach.')->middleware(['auth', 'role:coach'])->grou
     Route::get('attendance', [\App\Http\Controllers\Coach\AttendanceController::class, 'index'])->name('attendance.index');
     Route::get('attendance/record', [\App\Http\Controllers\Coach\AttendanceController::class, 'record'])->name('attendance.record');
     Route::post('attendance/scan', [\App\Http\Controllers\Coach\AttendanceController::class, 'scan'])->name('attendance.scan');
+    Route::post('attendance/record', [\App\Http\Controllers\Coach\AttendanceController::class, 'recordManual'])->name('attendance.record');
+    Route::get('api/members/search', [\App\Http\Controllers\Coach\AttendanceController::class, 'searchMembers'])->name('api.members.search');
     Route::post('attendance/{attendance}/checkout', [\App\Http\Controllers\Coach\AttendanceController::class, 'checkout'])->name('attendance.checkout');
     Route::post('attendance/member/{member}/checkin', [\App\Http\Controllers\Coach\AttendanceController::class, 'forceCheckIn'])->name('attendance.force-checkin');
     
@@ -171,6 +175,10 @@ Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->g
     Route::get('attendance/qrcode', [\App\Http\Controllers\Member\QrCodeController::class, 'show'])->name('member.attendance');
     // Toggle attendance (replaces QR check-in flow)
     Route::post('attendance/toggle', [\App\Http\Controllers\Member\AttendanceController::class, 'toggle'])->name('attendance.toggle');
+    
+    // Payments
+    Route::get('payments', [\App\Http\Controllers\Member\PaymentController::class, 'index'])->name('payments.index');
+    Route::post('payments/online', [\App\Http\Controllers\Member\PaymentController::class, 'onlinePayment'])->name('payments.online');
 });
 
 // Autres pages publiques

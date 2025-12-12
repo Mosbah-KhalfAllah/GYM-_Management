@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('payment_id')->unique();
             $table->decimal('amount', 10, 2);
-            $table->string('currency')->default('USD');
+            $table->string('currency')->default('TND');
             $table->enum('status', ['pending', 'completed', 'failed', 'refunded']);
             $table->string('payment_method');
             $table->string('payment_gateway')->default('stripe');

@@ -36,8 +36,8 @@
                     
                     <!-- Montant -->
                     <div>
-                        <label for="quickAmount" class="block text-sm font-medium text-gray-700 mb-1">Montant (€)</label>
-                        <input type="number" id="quickAmount" name="amount" step="0.01" min="0.01" max="999999.99" 
+                        <label for="quickAmount" class="block text-sm font-medium text-gray-700 mb-1">Montant (DT)</label>
+                        <input type="number" id="quickAmount" name="amount" step="0.01" min="0" max="999999.99" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                placeholder="50.00" required>
                     </div>

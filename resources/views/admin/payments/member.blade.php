@@ -34,7 +34,7 @@
             <!-- Statistiques des paiements -->
             <div class="bg-gray-50 rounded-lg p-4">
                 <h4 class="text-sm font-medium text-gray-700 mb-2">Total des paiements</h4>
-                <p class="text-2xl font-bold text-gray-900">{{ number_format($payments->sum('amount'), 2) }}€</p>
+                <p class="text-2xl font-bold text-gray-900">{{ number_format($payments->sum('amount'), 2) }}DT</p>
                 <p class="text-sm text-gray-500">{{ $payments->total() }} paiement(s)</p>
             </div>
             
@@ -42,7 +42,7 @@
             <div class="bg-gray-50 rounded-lg p-4">
                 <h4 class="text-sm font-medium text-gray-700 mb-2">Dernier paiement</h4>
                 @if($payments->count() > 0)
-                    <p class="text-lg font-semibold text-gray-900">{{ number_format($payments->first()->amount, 2) }}€</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ number_format($payments->first()->amount, 2) }}DT</p>
                     <p class="text-sm text-gray-500">{{ $payments->first()->created_at->format('d/m/Y') }}</p>
                 @else
                     <p class="text-sm text-gray-500">Aucun paiement</p>
@@ -74,7 +74,7 @@
                                 #{{ $payment->id }}
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ number_format($payment->amount, 2) }}€
+                                {{ number_format($payment->amount, 2) }}DT
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium

@@ -68,7 +68,7 @@ class MemberController extends Controller
             'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
             'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/', 'unique:users'],
             'password' => 'required|string|min:8|confirmed',
             'birth_date' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(10)->toDateString(), 'after:1920-01-01'],
             'gender' => 'nullable|string|in:male,female,other',
@@ -86,6 +86,7 @@ class MemberController extends Controller
             'email.unique' => 'Cet email est déjà utilisé.',
             'phone.regex' => 'Le téléphone doit contenir uniquement des chiffres et caractères spéciaux (+, -, parenthèses).',
             'phone.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'phone.unique' => 'Ce numéro de téléphone est déjà utilisé.',
             'password.required' => 'Le mot de passe est requis.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
             'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
@@ -167,7 +168,7 @@ class MemberController extends Controller
             'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
             'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
             'email' => 'required|string|email|max:255|unique:users,email,' . $member->id,
-            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/', 'unique:users,phone,' . $member->id],
             'birth_date' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(10)->toDateString(), 'after:1920-01-01'],
             'gender' => 'nullable|string|in:male,female,other',
             'address' => 'nullable|string|max:500',
@@ -185,6 +186,7 @@ class MemberController extends Controller
             'email.unique' => 'Cet email est déjà utilisé.',
             'phone.regex' => 'Le téléphone doit contenir uniquement des chiffres et caractères spéciaux (+, -, parenthèses).',
             'phone.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'phone.unique' => 'Ce numéro de téléphone est déjà utilisé.',
             'birth_date.date' => 'La date de naissance doit être une date valide.',
             'birth_date.before_or_equal' => 'L\'âge minimum requis est 10 ans.',
             'birth_date.after' => 'La date de naissance doit être après 1920.',
@@ -225,5 +227,35 @@ class MemberController extends Controller
         }
 
         return redirect()->route('admin.attendance.index')->with('info', 'Consultez la page des présences pour gérer les entrées/sorties.');
+    }
+    
+    /**
+     * Search member by phone number.
+     */
+    public function searchByPhone(Request $request)
+    {
+        $phone = $request->input('phone');
+        
+        $member = User::where('role', 'member')
+            ->where('phone', $phone)
+            ->where('is_active', true)
+            ->first();
+            
+        if ($member) {
+            return response()->json([
+                'success' => true,
+                'member' => [
+                    'id' => $member->id,
+                    'name' => $member->first_name . ' ' . $member->last_name,
+                    'email' => $member->email,
+                    'phone' => $member->phone
+                ]
+            ]);
+        }
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Membre non trouvé'
+        ]);
     }
 }

@@ -9,7 +9,7 @@ use App\Models\Attendance;
 use App\Models\Membership;
 use App\Models\ClassModel;
 use App\Models\Equipment;
-// use App\Models\Payment; // Commenter temporairement
+use App\Models\Payment;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -27,11 +27,10 @@ class DashboardController extends Controller
             'upcoming_classes' => ClassModel::where('schedule_time', '>', now())
                 ->where('status', 'scheduled')
                 ->count(),
-            'equipment_issues' => Equipment::whereIn('status', ['maintenance', 'broken'])->count(),
-            'monthly_revenue' => 0, // Temporairement à 0
-            // 'monthly_revenue' => Payment::whereMonth('created_at', now()->month)
-            //     ->where('status', 'completed')
-            //     ->sum('amount'),
+            'equipment_issues' => Equipment::whereIn('status', ['maintenance', 'out_of_order'])->count(),
+            'monthly_revenue' => Payment::whereMonth('created_at', now()->month)
+                ->where('status', 'completed')
+                ->sum('amount'),
         ];
 
         // Données pour les graphiques
@@ -45,12 +44,11 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        $recentPayments = []; // Temporairement vide
-        // $recentPayments = Payment::with('user')
-        //     ->where('status', 'completed')
-        //     ->latest()
-        //     ->take(10)
-        //     ->get();
+        $recentPayments = Payment::with('user')
+            ->where('status', 'completed')
+            ->latest()
+            ->take(10)
+            ->get();
 
         return view('admin.dashboard', compact(
             'stats',
@@ -81,11 +79,10 @@ class DashboardController extends Controller
         $data = [];
         for ($i = 11; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
-            $revenue = 0; // Temporairement à 0
-            // $revenue = Payment::whereYear('created_at', $date->year)
-            //     ->whereMonth('created_at', $date->month)
-            //     ->where('status', 'completed')
-            //     ->sum('amount');
+            $revenue = Payment::whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->where('status', 'completed')
+                ->sum('amount');
             $data[] = [
                 'month' => $date->format('M Y'),
                 'revenue' => $revenue

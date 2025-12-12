@@ -19,8 +19,6 @@ return new class extends Migration
             $table->decimal('weight', 8, 2)->nullable();
             $table->integer('rest_seconds')->default(60);
             $table->integer('day_number');
-            $table->string('video_url')->nullable();
-            $table->string('image_path')->nullable();
             $table->timestamps();
         });
     }

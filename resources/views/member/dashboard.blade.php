@@ -272,6 +272,18 @@
                 </div>
             </div>
 
+            <!-- Membership Status -->
+            @if(Auth::user()->membership && (Auth::user()->membership->status === 'expired' || Auth::user()->membership->end_date->isPast()))
+            <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white">
+                <h3 class="text-lg font-semibold mb-2">Adhésion Expirée</h3>
+                <p class="text-red-100 text-sm mb-4">Votre adhésion a expiré le {{ Auth::user()->membership->end_date->format('d/m/Y') }}</p>
+                <a href="{{ route('member.payments.index') }}" class="inline-flex items-center px-4 py-2 bg-white text-red-600 rounded-lg hover:bg-gray-100 font-medium">
+                    <i class="fas fa-credit-card mr-2"></i>
+                    Payer maintenant
+                </a>
+            </div>
+            @endif
+
             <!-- Quick Actions -->
             <div class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl shadow-lg p-6 text-white">
                 <h3 class="text-lg font-semibold mb-4">Actions Rapides</h3>
@@ -287,6 +299,10 @@
                     <a href="{{ route('member.progress.index') }}" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
                         <span class="font-medium">Ma Progression</span>
                         <i class="fas fa-chart-line"></i>
+                    </a>
+                    <a href="{{ route('member.payments.index') }}" class="flex items-center justify-between p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                        <span class="font-medium">Mes Paiements</span>
+                        <i class="fas fa-credit-card"></i>
                     </a>
                 </div>
             </div>

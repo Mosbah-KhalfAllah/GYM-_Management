@@ -16,21 +16,41 @@
                 <div class="space-y-4">
                     <h3 class="text-lg font-medium text-gray-700 mb-4">Informations du membre</h3>
                     
-                    <x-form-field
-                        name="user_id"
-                        label="Membre"
-                        type="select"
-                        :required="true"
-                        :error="$errors->first('user_id')"
-                        :value="old('user_id', $selectedMemberId ?? '')"
-                    >
-                        <option value="">Sélectionnez un membre</option>
-                        @foreach($members ?? [] as $member)
-                            <option value="{{ $member->id }}" {{ old('user_id', $selectedMemberId ?? '') == $member->id ? 'selected' : '' }}>
-                                {{ $member->name }} ({{ $member->email }})
-                            </option>
-                        @endforeach
-                    </x-form-field>
+                    <!-- Recherche par téléphone -->
+                    <div>
+                        <label for="phone_search" class="block text-sm font-medium text-gray-700 mb-1">Rechercher par téléphone</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="phone_search" placeholder="Numéro de téléphone" 
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <button type="button" id="search_btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Membre sélectionné -->
+                    <div id="member_info" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Membre trouvé</label>
+                        <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                                        <span id="member_initials" class="text-sm font-medium text-white"></span>
+                                    </div>
+                                </div>
+                                <div class="ml-3">
+                                    <div id="member_name" class="text-sm font-medium text-gray-900"></div>
+                                    <div id="member_email" class="text-sm text-gray-500"></div>
+                                    <div id="member_phone" class="text-sm text-gray-500"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="user_id" id="selected_user_id" required>
+                    @error('user_id')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 
                 <!-- Détails du paiement -->
@@ -40,12 +60,12 @@
                     <div class="grid grid-cols-2 gap-4">
                         <x-form-field
                             name="amount"
-                            label="Montant (€)"
+                            label="Montant (DT)"
                             type="number"
                             placeholder="50.00"
                             :required="true"
                             step="0.01"
-                            min="0.01"
+                            min="0"
                             max="999999.99"
                             :error="$errors->first('amount')"
                             :value="old('amount')"
@@ -56,9 +76,9 @@
                             label="Devise"
                             type="select"
                             :error="$errors->first('currency')"
-                            :value="old('currency', 'EUR')"
+                            :value="old('currency', 'TND')"
                         >
-                            <option value="EUR">EUR (€)</option>
+                            <option value="TND">TND (DT)</option>
                             <option value="USD">USD ($)</option>
                         </x-form-field>
                     </div>
@@ -125,6 +145,63 @@ document.addEventListener('DOMContentLoaded', function() {
     const amountInput = form.querySelector('input[name="amount"]');
     const methodSelect = form.querySelector('select[name="payment_method"]');
     const statusSelect = form.querySelector('select[name="status"]');
+    const phoneSearch = document.getElementById('phone_search');
+    const searchBtn = document.getElementById('search_btn');
+    const memberInfo = document.getElementById('member_info');
+    const selectedUserId = document.getElementById('selected_user_id');
+    
+    // Recherche par téléphone
+    function searchMember() {
+        const phone = phoneSearch.value.trim();
+        if (!phone) {
+            alert('Veuillez saisir un numéro de téléphone');
+            return;
+        }
+        
+        searchBtn.disabled = true;
+        searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        fetch('/admin/members/search-by-phone', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ phone: phone })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.member) {
+                // Afficher les informations du membre
+                document.getElementById('member_name').textContent = data.member.name;
+                document.getElementById('member_email').textContent = data.member.email;
+                document.getElementById('member_phone').textContent = data.member.phone;
+                document.getElementById('member_initials').textContent = data.member.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                selectedUserId.value = data.member.id;
+                memberInfo.classList.remove('hidden');
+            } else {
+                alert('Aucun membre trouvé avec ce numéro de téléphone');
+                memberInfo.classList.add('hidden');
+                selectedUserId.value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la recherche');
+        })
+        .finally(() => {
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = '<i class="fas fa-search"></i>';
+        });
+    }
+    
+    searchBtn.addEventListener('click', searchMember);
+    phoneSearch.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchMember();
+        }
+    });
     
     // Auto-compléter le statut selon la méthode
     methodSelect.addEventListener('change', function() {
@@ -138,8 +215,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Validation du montant
     amountInput.addEventListener('input', function() {
         const value = parseFloat(this.value);
-        if (value && value < 0.01) {
-            this.setCustomValidity('Le montant doit être supérieur à 0');
+        if (value && value < 0) {
+            this.setCustomValidity('Le montant doit être supérieur ou égal à 0');
         } else if (value && value > 999999.99) {
             this.setCustomValidity('Le montant ne peut pas dépasser 999,999.99');
         } else {

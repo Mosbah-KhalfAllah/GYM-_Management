@@ -11,7 +11,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-green-100 text-sm">Revenus totaux</p>
-                    <p class="text-2xl font-bold">{{ number_format($totalRevenue ?? 0, 2) }}€</p>
+                    <p class="text-2xl font-bold">{{ number_format($totalRevenue ?? 0, 2) }}DT</p>
                 </div>
                 <i class="fas fa-euro-sign text-3xl text-green-200"></i>
             </div>
@@ -21,7 +21,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-blue-100 text-sm">Revenus ce mois</p>
-                    <p class="text-2xl font-bold">{{ number_format($monthlyRevenue ?? 0, 2) }}€</p>
+                    <p class="text-2xl font-bold">{{ number_format($monthlyRevenue ?? 0, 2) }}DT</p>
                 </div>
                 <i class="fas fa-calendar-alt text-3xl text-blue-200"></i>
             </div>
@@ -135,7 +135,7 @@
                                 </div>
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ number_format($payment->amount, 2) }}€
+                                {{ number_format($payment->amount, 2) }}DT
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
@@ -179,6 +179,15 @@
                                     <a href="{{ route('admin.payments.edit', $payment) }}" class="text-indigo-600 hover:text-indigo-900" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
+                                    @if($payment->status === 'pending')
+                                        <form action="{{ route('admin.payments.accept', $payment) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="text-green-600 hover:text-green-900" title="Accepter">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                     <form action="{{ route('admin.payments.destroy', $payment) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce paiement ?')">
                                         @csrf
                                         @method('DELETE')

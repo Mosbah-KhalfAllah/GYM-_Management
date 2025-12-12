@@ -47,18 +47,12 @@ class ExerciseController extends Controller
             'weight' => 'nullable|numeric|min:0',
             'rest_seconds' => 'required|integer|min:0',
             'day_number' => 'required|integer|min:1',
-            'video_url' => 'nullable|url',
-            'image' => 'nullable|image|max:2048',
         ]);
 
         // Vérifier que le programme appartient au coach
         $program = WorkoutProgram::findOrFail($validated['program_id']);
         if ($program->coach_id !== auth()->id()) {
             abort(403);
-        }
-
-        if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('exercises', 'public');
         }
 
         Exercise::create($validated);
@@ -113,22 +107,12 @@ class ExerciseController extends Controller
             'weight' => 'nullable|numeric|min:0',
             'rest_seconds' => 'required|integer|min:0',
             'day_number' => 'required|integer|min:1',
-            'video_url' => 'nullable|url',
-            'image' => 'nullable|image|max:2048',
         ]);
 
         // Vérifier que le nouveau programme appartient au coach
         $program = WorkoutProgram::findOrFail($validated['program_id']);
         if ($program->coach_id !== auth()->id()) {
             abort(403);
-        }
-
-        if ($request->hasFile('image')) {
-            // Supprimer l'ancienne image si elle existe
-            if ($exercise->image_path) {
-                \Storage::disk('public')->delete($exercise->image_path);
-            }
-            $validated['image_path'] = $request->file('image')->store('exercises', 'public');
         }
 
         $exercise->update($validated);
@@ -144,11 +128,6 @@ class ExerciseController extends Controller
     {
         if ($exercise->program->coach_id !== auth()->id()) {
             abort(403);
-        }
-
-        // Supprimer l'image si elle existe
-        if ($exercise->image_path) {
-            \Storage::disk('public')->delete($exercise->image_path);
         }
 
         $exercise->delete();

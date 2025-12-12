@@ -65,13 +65,13 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'amount' => 'required|numeric|min:0.01|max:999999.99',
+            'amount' => 'required|numeric|min:0|max:999999.99',
             'payment_method' => 'required|in:cash,card,online',
             'description' => 'nullable|string|max:500',
         ]);
 
         $validated['payment_id'] = 'PAY_' . strtoupper(uniqid());
-        $validated['currency'] = 'EUR';
+        $validated['currency'] = 'TND';
         $validated['status'] = 'completed';
         $validated['payment_gateway'] = 'manual';
 
@@ -88,7 +88,7 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'amount' => 'required|numeric|min:0.01|max:999999.99',
+            'amount' => 'required|numeric|min:0|max:999999.99',
             'payment_method' => 'required|in:cash,card,online',
             'status' => 'required|in:pending,completed,failed',
             'description' => 'nullable|string|max:500',
@@ -98,14 +98,14 @@ class PaymentController extends Controller
             'user_id.exists' => 'Le membre sélectionné n\'existe pas.',
             'amount.required' => 'Le montant est requis.',
             'amount.numeric' => 'Le montant doit être un nombre.',
-            'amount.min' => 'Le montant doit être supérieur à 0.',
+            'amount.min' => 'Le montant doit être supérieur ou égal à 0.',
             'payment_method.required' => 'La méthode de paiement est requise.',
             'status.required' => 'Le statut est requis.',
             'description.max' => 'La description ne peut pas dépasser 500 caractères.',
         ]);
 
         $validated['payment_id'] = 'PAY_' . strtoupper(uniqid());
-        $validated['currency'] = $validated['currency'] ?? 'EUR';
+        $validated['currency'] = $validated['currency'] ?? 'TND';
         $validated['payment_gateway'] = 'manual';
 
         Payment::create($validated);
@@ -130,7 +130,7 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'amount' => 'required|numeric|min:0.01|max:999999.99',
+            'amount' => 'required|numeric|min:0|max:999999.99',
             'payment_method' => 'required|in:cash,card,online',
             'status' => 'required|in:pending,completed,failed,refunded',
             'description' => 'nullable|string|max:500',
@@ -140,13 +140,13 @@ class PaymentController extends Controller
             'user_id.exists' => 'Le membre sélectionné n\'existe pas.',
             'amount.required' => 'Le montant est requis.',
             'amount.numeric' => 'Le montant doit être un nombre.',
-            'amount.min' => 'Le montant doit être supérieur à 0.',
+            'amount.min' => 'Le montant doit être supérieur ou égal à 0.',
             'payment_method.required' => 'La méthode de paiement est requise.',
             'status.required' => 'Le statut est requis.',
             'description.max' => 'La description ne peut pas dépasser 500 caractères.',
         ]);
 
-        $validated['currency'] = $validated['currency'] ?? 'EUR';
+        $validated['currency'] = $validated['currency'] ?? 'TND';
         
         $payment->update($validated);
         return redirect()->route('admin.payments.index')
@@ -169,5 +169,13 @@ class PaymentController extends Controller
             ->paginate(10);
             
         return view('admin.payments.member', compact('member', 'payments'));
+    }
+    
+    public function accept(Payment $payment)
+    {
+        $payment->update(['status' => 'completed']);
+        
+        return redirect()->route('admin.payments.index')
+            ->with('success', 'Paiement accepté avec succès.');
     }
 }

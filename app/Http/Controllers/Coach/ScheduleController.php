@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Coach;
 use App\Http\Controllers\Controller;
 use App\Models\ClassModel;
 use App\Models\WorkoutProgram;
+use App\Models\User;
 use Carbon\Carbon;
 
 class ScheduleController extends Controller
