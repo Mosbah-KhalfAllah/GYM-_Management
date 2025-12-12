@@ -20,11 +20,11 @@
                 @endforeach
             </x-form-field>
 
-            <x-form-field label="Titre du programme" name="title" type="text" placeholder="Ex: Prise de masse musculaire" value="{{ $program->title }}" required />
+            <x-form-field label="Titre du programme" name="title" type="text" placeholder="Ex: Prise de masse musculaire" maxlength="150" minlength="3" value="{{ $program->title }}" required />
 
             <div class="form-group">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea name="description" rows="4" class="block w-full border rounded-lg p-3 focus:outline-none focus:border-blue-500 @error('description') border-red-500 @enderror">{{ $program->description }}</textarea>
+                <textarea name="description" rows="4" maxlength="1000" class="block w-full border rounded-lg p-3 focus:outline-none focus:border-blue-500 @error('description') border-red-500 @enderror">{{ $program->description }}</textarea>
                 @error('description')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -60,3 +60,4 @@
     </div>
 </div>
 @endsection
+

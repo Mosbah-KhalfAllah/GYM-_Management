@@ -29,17 +29,14 @@ class EquipmentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'serial_number' => 'required|string|max:100|unique:equipment',
-            'purchase_date' => 'required|date',
-            'last_maintenance_date' => 'required|date',
-            'next_maintenance_date' => 'required|date',
-            'status' => 'required|in:available,in_use,maintenance,broken',
-            'location' => 'required|string|max:255',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'assigned_to' => 'nullable|exists:users,id',
-            'notes' => 'nullable|string',
+            'name' => 'required|string|max:100|min:2',
+            'location' => 'nullable|string|max:100',
+            'status' => 'required|in:available,maintenance,broken',
+            'notes' => 'nullable|string|max:500',
+        ], [
+            'name.required' => 'Le nom de l\'équipement est requis.',
+            'name.max' => 'Le nom ne peut pas dépasser 100 caractères.',
+            'notes.max' => 'Les notes ne peuvent pas dépasser 500 caractères.',
         ]);
 
         Equipment::create($validated);
@@ -62,17 +59,14 @@ class EquipmentController extends Controller
     public function update(Request $request, Equipment $equipment)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'serial_number' => 'required|string|max:100|unique:equipment,serial_number,' . $equipment->id,
-            'purchase_date' => 'required|date',
-            'last_maintenance_date' => 'required|date',
-            'next_maintenance_date' => 'required|date',
-            'status' => 'required|in:available,in_use,maintenance,broken',
-            'location' => 'required|string|max:255',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'assigned_to' => 'nullable|exists:users,id',
-            'notes' => 'nullable|string',
+            'name' => 'required|string|max:100|min:2',
+            'location' => 'nullable|string|max:100',
+            'status' => 'required|in:available,maintenance,broken',
+            'notes' => 'nullable|string|max:500',
+        ], [
+            'name.required' => 'Le nom de l\'équipement est requis.',
+            'name.max' => 'Le nom ne peut pas dépasser 100 caractères.',
+            'notes.max' => 'Les notes ne peuvent pas dépasser 500 caractères.',
         ]);
 
         $equipment->update($validated);

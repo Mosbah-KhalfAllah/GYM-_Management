@@ -8,3 +8,4 @@
     <p>Informations sur le challenge — placeholder.</p>
 </div>
 @endsection
+

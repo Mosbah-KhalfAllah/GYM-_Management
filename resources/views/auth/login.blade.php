@@ -35,7 +35,7 @@
             </div>
 
             <!-- Formulaire de connexion -->
-            <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST">
+            <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST" id="loginForm" novalidate>
                 @csrf
                 
                 <!-- Messages d'erreur -->
@@ -68,7 +68,11 @@
                             class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                             placeholder="votre@email.com"
                         >
+                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 hidden" id="emailError">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </span>
                     </div>
+                    <p class="text-red-500 text-xs mt-1 hidden" id="emailMsg"></p>
                 </div>
 
                 <!-- Champ mot de passe -->
@@ -89,7 +93,11 @@
                             class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                             placeholder="Votre mot de passe"
                         >
+                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 hidden" id="passwordError">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </span>
                     </div>
+                    <p class="text-red-500 text-xs mt-1 hidden" id="passwordMsg"></p>
                 </div>
 
                 <!-- Remember me & Forgot password -->
@@ -127,51 +135,6 @@
                 </div>
             </form>
 
-            <!-- Comptes de démonstration -->
-            <div class="mt-6 pt-6 border-t border-gray-200">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">Comptes de démonstration :</h3>
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm">
-                                <i class="fas fa-crown"></i>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-900">Administrateur</p>
-                                <p class="text-xs text-gray-600">admin@gym.com</p>
-                            </div>
-                        </div>
-                        <code class="text-xs bg-gray-100 px-2 py-1 rounded">password</code>
-                    </div>
-                    
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center text-white text-sm">
-                                <i class="fas fa-user-tie"></i>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-900">Coach</p>
-                                <p class="text-xs text-gray-600">coach@gym.com</p>
-                            </div>
-                        </div>
-                        <code class="text-xs bg-gray-100 px-2 py-1 rounded">password</code>
-                    </div>
-                    
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-900">Membre</p>
-                                <p class="text-xs text-gray-600">member@gym.com</p>
-                            </div>
-                        </div>
-                        <code class="text-xs bg-gray-100 px-2 py-1 rounded">password</code>
-                    </div>
-                </div>
-            </div>
-
             <!-- Footer -->
             <div class="text-center text-sm text-gray-500 mt-6 pt-6 border-t border-gray-200">
                 <p>© {{ date('Y') }} GYM Management. Tous droits réservés.</p>
@@ -182,18 +145,114 @@
 
     <!-- Script pour améliorer l'UX -->
     <script>
-        // Animation de chargement
-        document.querySelector('form').addEventListener('submit', function(e) {
+        // Validation login
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showError(input, errorSpan, errorMsg, msg) {
+            input.classList.add('border-red-500');
+            input.classList.remove('border-gray-300');
+            errorSpan.classList.remove('hidden');
+            errorMsg.classList.remove('hidden');
+            errorMsg.textContent = msg;
+        }
+
+        function clearError(input, errorSpan, errorMsg) {
+            input.classList.remove('border-red-500');
+            input.classList.add('border-gray-300');
+            errorSpan.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+        }
+
+        // Real-time email validation
+        emailInput.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                showError(this, document.getElementById('emailError'), document.getElementById('emailMsg'), 'L\'email est requis');
+            } else if (!validateEmail(this.value)) {
+                showError(this, document.getElementById('emailError'), document.getElementById('emailMsg'), 'Email invalide');
+            } else {
+                clearError(this, document.getElementById('emailError'), document.getElementById('emailMsg'));
+            }
+        });
+
+        emailInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                showError(this, document.getElementById('emailError'), document.getElementById('emailMsg'), 'L\'email est requis');
+            } else if (!validateEmail(this.value)) {
+                showError(this, document.getElementById('emailError'), document.getElementById('emailMsg'), 'Email invalide');
+            } else {
+                clearError(this, document.getElementById('emailError'), document.getElementById('emailMsg'));
+            }
+        });
+
+        // Real-time password validation
+        passwordInput.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                showError(this, document.getElementById('passwordError'), document.getElementById('passwordMsg'), 'Le mot de passe est requis');
+            } else if (this.value.length < 6) {
+                showError(this, document.getElementById('passwordError'), document.getElementById('passwordMsg'), 'Minimum 6 caractères');
+            } else {
+                clearError(this, document.getElementById('passwordError'), document.getElementById('passwordMsg'));
+            }
+        });
+
+        passwordInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                showError(this, document.getElementById('passwordError'), document.getElementById('passwordMsg'), 'Le mot de passe est requis');
+            } else if (this.value.length < 6) {
+                showError(this, document.getElementById('passwordError'), document.getElementById('passwordMsg'), 'Minimum 6 caractères');
+            } else {
+                clearError(this, document.getElementById('passwordError'), document.getElementById('passwordMsg'));
+            }
+        });
+
+        // Form submission validation
+        loginForm.addEventListener('submit', function(e) {
+            let isValid = true;
+
+            // Email validation
+            if (emailInput.value.trim() === '') {
+                showError(emailInput, document.getElementById('emailError'), document.getElementById('emailMsg'), 'L\'email est requis');
+                isValid = false;
+            } else if (!validateEmail(emailInput.value)) {
+                showError(emailInput, document.getElementById('emailError'), document.getElementById('emailMsg'), 'Email invalide');
+                isValid = false;
+            } else {
+                clearError(emailInput, document.getElementById('emailError'), document.getElementById('emailMsg'));
+            }
+
+            // Password validation
+            if (passwordInput.value.trim() === '') {
+                showError(passwordInput, document.getElementById('passwordError'), document.getElementById('passwordMsg'), 'Le mot de passe est requis');
+                isValid = false;
+            } else if (passwordInput.value.length < 6) {
+                showError(passwordInput, document.getElementById('passwordError'), document.getElementById('passwordMsg'), 'Minimum 6 caractères');
+                isValid = false;
+            } else {
+                clearError(passwordInput, document.getElementById('passwordError'), document.getElementById('passwordMsg'));
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Veuillez corriger les erreurs dans le formulaire');
+                return;
+            }
+
             const button = this.querySelector('button[type="submit"]');
             button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connexion en cours...';
             button.disabled = true;
         });
 
         // Toggle password visibility
-        const passwordInput = document.getElementById('password');
         const togglePassword = document.createElement('span');
         togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
-        togglePassword.className = 'absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600';
+        togglePassword.className = 'absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600 transition-colors';
         togglePassword.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
@@ -202,7 +261,7 @@
         passwordInput.parentNode.appendChild(togglePassword);
 
         // Auto-focus on email field
-        document.getElementById('email').focus();
+        emailInput.focus();
     </script>
 </body>
 </html>

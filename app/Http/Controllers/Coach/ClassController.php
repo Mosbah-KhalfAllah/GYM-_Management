@@ -37,23 +37,29 @@ class ClassController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'schedule_time' => 'required|date|after:now',
-            'duration_minutes' => 'required|integer|min:30|max:240',
-            'capacity' => 'required|integer|min:1|max:100',
-            'location' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
+            'name' => 'required|string|max:100|min:3',
+            'type' => 'required|string|max:50|min:3',
+            'level' => 'required|in:beginner,intermediate,advanced,expert',
+            'duration' => 'required|integer|min:15|max:180',
+            'max_participants' => 'required|integer|min:1|max:200',
+            'schedule_day' => 'required|in:Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi,Dimanche',
+            'start_time' => 'required|date_format:H:i',
+            'description' => 'required|string|max:1000',
+        ], [
+            'name.min' => 'Le nom doit contenir au moins 3 caractères.',
+            'name.max' => 'Le nom ne peut pas dépasser 100 caractères.',
+            'type.min' => 'Le type doit contenir au moins 3 caractères.',
+            'duration.min' => 'La durée doit être au minimum 15 minutes.',
+            'duration.max' => 'La durée ne peut pas dépasser 180 minutes.',
+            'description.max' => 'La description ne peut pas dépasser 1000 caractères.',
         ]);
 
         $validated['coach_id'] = auth()->id();
-        $validated['status'] = 'scheduled';
-        $validated['registered_count'] = 0;
 
         ClassModel::create($validated);
 
         return redirect()->route('coach.classes.index')
-            ->with('success', 'Cours créé avec succès.');
+            ->with('success', 'Classe créée avec succès.');
     }
 
     /**
@@ -92,20 +98,27 @@ class ClassController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'schedule_time' => 'required|date|after:now',
-            'duration_minutes' => 'required|integer|min:30|max:240',
-            'capacity' => 'required|integer|min:1|max:100',
-            'location' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'status' => 'required|in:scheduled,ongoing,completed,cancelled',
+            'name' => 'required|string|max:100|min:3',
+            'type' => 'required|string|max:50|min:3',
+            'level' => 'required|in:beginner,intermediate,advanced,expert',
+            'duration' => 'required|integer|min:15|max:180',
+            'max_participants' => 'required|integer|min:1|max:200',
+            'schedule_day' => 'required|in:Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi,Dimanche',
+            'start_time' => 'required|date_format:H:i',
+            'description' => 'required|string|max:1000',
+        ], [
+            'name.min' => 'Le nom doit contenir au moins 3 caractères.',
+            'name.max' => 'Le nom ne peut pas dépasser 100 caractères.',
+            'type.min' => 'Le type doit contenir au moins 3 caractères.',
+            'duration.min' => 'La durée doit être au minimum 15 minutes.',
+            'duration.max' => 'La durée ne peut pas dépasser 180 minutes.',
+            'description.max' => 'La description ne peut pas dépasser 1000 caractères.',
         ]);
 
         $class->update($validated);
 
         return redirect()->route('coach.classes.index')
-            ->with('success', 'Cours mis à jour avec succès.');
+            ->with('success', 'Classe mise à jour avec succès.');
     }
 
     /**

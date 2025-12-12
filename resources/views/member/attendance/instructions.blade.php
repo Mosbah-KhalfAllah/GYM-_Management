@@ -8,3 +8,4 @@
     <p>Expliquez comment scanner et utiliser le QR Code — placeholder.</p>
 </div>
 @endsection
+

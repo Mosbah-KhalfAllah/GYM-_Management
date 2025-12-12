@@ -32,16 +32,21 @@ class ProgramController extends Controller
         $coach = Auth::user();
         
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'level' => 'required|in:beginner,intermediate,advanced',
-            'duration_days' => 'required|integer|min:1',
-            'goal' => 'required|in:weight_loss,muscle_gain,endurance,flexibility',
+            'title' => 'required|string|max:150|min:3',
+            'description' => 'nullable|string|max:1000',
+            'duration_weeks' => 'required|integer|min:1|max:52',
+        ], [
+            'title.min' => 'Le titre doit contenir au moins 3 caractères.',
+            'title.max' => 'Le titre ne peut pas dépasser 150 caractères.',
+            'description.max' => 'La description ne peut pas dépasser 1000 caractères.',
+            'duration_weeks.max' => 'La durée ne peut pas dépasser 52 semaines.',
         ]);
 
         $program = WorkoutProgram::create(array_merge($validated, [
             'coach_id' => $coach->id,
             'is_active' => true,
+            'level' => 'beginner',
+            'goal' => 'muscle_gain',
         ]));
 
         return redirect()->route('coach.programs.show', $program)
@@ -71,12 +76,14 @@ class ProgramController extends Controller
         $this->authorize('update', $program);
         
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'level' => 'required|in:beginner,intermediate,advanced',
-            'duration_days' => 'required|integer|min:1',
-            'goal' => 'required|in:weight_loss,muscle_gain,endurance,flexibility',
-            'is_active' => 'boolean',
+            'title' => 'required|string|max:150|min:3',
+            'description' => 'nullable|string|max:1000',
+            'duration_weeks' => 'required|integer|min:1|max:52',
+        ], [
+            'title.min' => 'Le titre doit contenir au moins 3 caractères.',
+            'title.max' => 'Le titre ne peut pas dépasser 150 caractères.',
+            'description.max' => 'La description ne peut pas dépasser 1000 caractères.',
+            'duration_weeks.max' => 'La durée ne peut pas dépasser 52 semaines.',
         ]);
 
         $program->update($validated);

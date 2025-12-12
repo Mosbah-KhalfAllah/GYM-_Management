@@ -47,7 +47,7 @@ class WorkoutController extends Controller
         $weekStats = [
             'workout_days' => Attendance::where('user_id', $user->id)
                 ->whereBetween('check_in', [now()->startOfWeek(), now()->endOfWeek()])
-                ->distinct('date')
+                ->selectRaw('DISTINCT DATE(check_in) as date')
                 ->count(),
             'total_minutes' => Attendance::where('user_id', $user->id)
                 ->whereBetween('check_in', [now()->startOfWeek(), now()->endOfWeek()])
@@ -83,10 +83,8 @@ class WorkoutController extends Controller
             ->first();
         
         if ($existingAttendance) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Vous êtes déjà dans la salle.'
-            ]);
+            return redirect()->route('member.workout.index')
+                ->with('error', 'Vous êtes déjà dans la salle.');
         }
         
         // Créer une nouvelle présence
@@ -96,11 +94,8 @@ class WorkoutController extends Controller
             'entry_method' => 'manual',
         ]);
         
-        return response()->json([
-            'success' => true,
-            'attendance' => $attendance,
-            'message' => 'Entrée enregistrée. Bon entraînement!'
-        ]);
+        return redirect()->route('member.workout.index')
+            ->with('success', 'Entrée enregistrée. Bon entraînement!');
     }
 
     /**
@@ -125,10 +120,7 @@ class WorkoutController extends Controller
             'duration_minutes' => $duration,
         ]);
         
-        return response()->json([
-            'success' => true,
-            'duration' => $duration,
-            'message' => 'Sortie enregistrée. Vous avez passé ' . $duration . ' minutes à la salle.'
-        ]);
+        return redirect()->route('member.workout.index')
+            ->with('success', 'Sortie enregistrée. Vous avez passé ' . $duration . ' minutes à la salle.');
     }
 }

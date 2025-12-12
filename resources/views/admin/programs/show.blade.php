@@ -8,3 +8,4 @@
     <p>Informations programme — placeholder.</p>
 </div>
 @endsection
+

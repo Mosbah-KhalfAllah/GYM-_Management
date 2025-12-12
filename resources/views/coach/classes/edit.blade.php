@@ -27,6 +27,8 @@
                 type="text"
                 value="{{ $class->name ?? $class->title }}"
                 placeholder="Ex: Yoga Avancé"
+                maxlength="100"
+                minlength="3"
                 required />
 
             <!-- Type -->
@@ -36,6 +38,8 @@
                 type="text"
                 value="{{ $class->type }}"
                 placeholder="Ex: Yoga, Pilates, Cardio"
+                maxlength="50"
+                minlength="3"
                 required />
 
             <!-- Niveau -->
@@ -43,7 +47,8 @@
                 label="Niveau"
                 name="level"
                 type="select"
-                value="{{ $class->level }}">
+                value="{{ $class->level }}"
+                required>
                 <option value="">-- Sélectionner --</option>
                 <option value="beginner">Débutant</option>
                 <option value="intermediate">Intermédiaire</option>
@@ -58,6 +63,8 @@
                 type="number"
                 value="{{ $class->duration }}"
                 placeholder="60"
+                min="15"
+                max="180"
                 required />
 
             <!-- Capacité max -->
@@ -67,6 +74,8 @@
                 type="number"
                 value="{{ $class->max_participants }}"
                 placeholder="20"
+                min="1"
+                max="200"
                 required />
 
             <!-- Jour de la semaine -->
@@ -74,7 +83,8 @@
                 label="Jour de la semaine"
                 name="schedule_day"
                 type="select"
-                value="{{ $class->schedule_day }}">
+                value="{{ $class->schedule_day }}"
+                required>
                 <option value="">-- Sélectionner --</option>
                 <option value="Lundi">Lundi</option>
                 <option value="Mardi">Mardi</option>
@@ -90,14 +100,16 @@
                 label="Heure de début"
                 name="start_time"
                 type="time"
-                value="{{ $class->start_time ? $class->start_time->format('H:i') : '' }}" />
+                value="{{ $class->start_time ? $class->start_time->format('H:i') : '' }}"
+                required />
         </div>
 
         <!-- Description (2 colonnes) -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
             <textarea name="description" 
-                      class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:border-blue-500 focus:outline-none transition @error('description') border-red-500 @enderror"
+                      maxlength="1000"
+                      @error('description') class="w-full rounded-lg border-2 !border-red-500 px-4 py-2 focus:outline-none transition" @else class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:border-blue-500 focus:outline-none transition" @enderror
                       rows="4"
                       placeholder="Décrivez votre classe...">{{ $class->description }}</textarea>
             @error('description')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
@@ -128,3 +140,4 @@
     </form>
 </div>
 @endsection
+

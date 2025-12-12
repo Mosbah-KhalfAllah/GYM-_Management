@@ -92,13 +92,19 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class);
     }
 
-    public function notifications()
+    // Relation pour les notifications personnalisées (si nécessaire)
+    public function customNotifications()
     {
-        return $this->hasMany(Notification::class);
+        return $this->hasMany(\App\Models\CustomNotification::class);
     }
 
     // Accessors
     public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function full_name()
     {
         return "{$this->first_name} {$this->last_name}";
     }

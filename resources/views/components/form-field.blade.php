@@ -7,6 +7,11 @@
     'placeholder' => '',
     'error' => null,
     'help' => '',
+    'pattern' => null,
+    'maxlength' => null,
+    'min' => null,
+    'max' => null,
+    'title' => null,
 ])
 
 <div class="mb-4">
@@ -22,13 +27,11 @@
             id="{{ $name }}"
             name="{{ $name }}"
             @if($required) required @endif
+            @if($maxlength) maxlength="{{ $maxlength }}" @endif
+            @if($title) title="{{ $title }}" @endif
             placeholder="{{ $placeholder }}"
             class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition
-                @if($error)
-                    border-red-500 focus:ring-red-500 focus:border-red-500
-                @else
-                    border-gray-300 focus:ring-blue-500 focus:border-blue-500
-                @endif"
+                {{ $error ? '!border-red-500 !focus:ring-red-500 !focus:border-red-500' : 'border border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
             rows="4"
         >{{ old($name, $value) }}</textarea>
     @elseif($type === 'select')
@@ -36,12 +39,9 @@
             id="{{ $name }}"
             name="{{ $name }}"
             @if($required) required @endif
+            @if($title) title="{{ $title }}" @endif
             class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition
-                @if($error)
-                    border-red-500 focus:ring-red-500 focus:border-red-500
-                @else
-                    border-gray-300 focus:ring-blue-500 focus:border-blue-500
-                @endif"
+                {{ $error ? '!border-red-500 !focus:ring-red-500 !focus:border-red-500' : 'border border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
         >
             <option value="">{{ $placeholder ?: 'Sélectionner une option' }}</option>
             {{ $slot }}
@@ -53,13 +53,14 @@
             name="{{ $name }}"
             value="{{ old($name, $value) }}"
             @if($required) required @endif
+            @if($pattern) pattern="{{ $pattern }}" @endif
+            @if($maxlength) maxlength="{{ $maxlength }}" @endif
+            @if($min) min="{{ $min }}" @endif
+            @if($max) max="{{ $max }}" @endif
+            @if($title) title="{{ $title }}" @endif
             placeholder="{{ $placeholder }}"
             class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition
-                @if($error)
-                    border-red-500 focus:ring-red-500 focus:border-red-500
-                @else
-                    border-gray-300 focus:ring-blue-500 focus:border-blue-500
-                @endif"
+                {{ $error ? '!border-red-500 !focus:ring-red-500 !focus:border-red-500' : 'border border-gray-300 focus:ring-blue-500 focus:border-blue-500' }}"
         />
     @endif
 
@@ -74,3 +75,4 @@
         <p class="mt-2 text-sm text-gray-500">{{ $help }}</p>
     @endif
 </div>
+

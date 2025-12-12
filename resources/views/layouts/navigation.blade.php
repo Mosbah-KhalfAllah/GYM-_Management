@@ -58,7 +58,7 @@
                         @endif
                     </div>
                     <div class="p-4 border-t">
-                        <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <a href="{{ route('notifications.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                             Voir toutes les notifications
                         </a>
                     </div>
@@ -83,17 +83,15 @@
                         <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
                     </div>
                     <div class="py-2">
-                        {{-- Lien temporaire pour Modifier le profil --}}
-                        <a href="#" 
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                           onclick="event.preventDefault(); alert('Fonctionnalité "Modifier le profil" à venir');">
+                        {{-- Lien vers Modifier le profil --}}
+                        <a href="{{ route('profile.edit') }}" 
+                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <i class="fas fa-user-edit mr-2"></i>Modifier le profil
                         </a>
                         
-                        {{-- Lien temporaire pour Changer le mot de passe --}}
-                        <a href="#" 
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                           onclick="event.preventDefault(); alert('Fonctionnalité "Changer le mot de passe" à venir');">
+                        {{-- Lien vers Changer le mot de passe --}}
+                        <a href="{{ route('password.edit') }}" 
+                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                             <i class="fas fa-key mr-2"></i>Changer le mot de passe
                         </a>
                         

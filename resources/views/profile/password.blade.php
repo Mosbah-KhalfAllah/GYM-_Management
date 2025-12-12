@@ -10,22 +10,34 @@
         @csrf
         @method('PATCH')
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Mot de passe actuel</label>
-            <input type="password" name="current_password" class="mt-1 block w-full rounded border-gray-300">
-            @error('current_password')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
-        </div>
+        <x-form-field
+            name="current_password"
+            label="Mot de passe actuel"
+            type="password"
+            required="true"
+            placeholder="Entrez votre mot de passe actuel"
+            :error="$errors->first('current_password')"
+        />
 
-        <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700">Nouveau mot de passe</label>
-            <input type="password" name="password" class="mt-1 block w-full rounded border-gray-300">
-            @error('password')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
-        </div>
+        <x-form-field
+            name="password"
+            label="Nouveau mot de passe"
+            type="password"
+            required="true"
+            minlength="8"
+            title="Min. 8 caractères"
+            placeholder="Min. 8 caractères"
+            :error="$errors->first('password')"
+        />
 
-        <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700">Confirmer le nouveau mot de passe</label>
-            <input type="password" name="password_confirmation" class="mt-1 block w-full rounded border-gray-300">
-        </div>
+        <x-form-field
+            name="password_confirmation"
+            label="Confirmer le nouveau mot de passe"
+            type="password"
+            required="true"
+            minlength="8"
+            placeholder="Répétez le mot de passe"
+        />
 
         <div class="mt-4">
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Mettre à jour le mot de passe</button>
@@ -33,3 +45,4 @@
     </form>
 </div>
 @endsection
+

@@ -6,30 +6,58 @@
 
 @section('content')
 <div class="space-y-6">
-    <!-- Header with search and actions -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">Gestion des Membres</h1>
-            <p class="text-gray-600 mt-1">Gérez tous les membres de votre salle de sport</p>
-        </div>
-        <div class="flex items-center gap-4">
-            <!-- Search -->
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
-                </div>
-                <input 
-                    type="text" 
-                    id="search" 
-                    placeholder="Rechercher un membre..." 
-                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full md:w-64"
-                >
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-800">Liste des membres</h2>
+        <a href="{{ route('admin.members.create') }}" class="btn-primary">
+            <i class="fas fa-plus mr-2"></i>
+            Ajouter un membre
+        </a>
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div>
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       placeholder="Rechercher un membre..." 
+                       class="form-input">
             </div>
-            <a href="{{ route('admin.members.create') }}" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2">
-                <i class="fas fa-plus"></i>
-                <span>Nouveau Membre</span>
-            </a>
-        </div>
+            <div>
+                <select name="status" class="form-select">
+                    <option value="">Tous les statuts</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Actif</option>
+                    <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>Expiré</option>
+                    <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Annulé</option>
+                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>En attente</option>
+                </select>
+            </div>
+            <div>
+                <select name="gender" class="form-select">
+                    <option value="">Tous les genres</option>
+                    <option value="male" {{ request('gender') === 'male' ? 'selected' : '' }}>Homme</option>
+                    <option value="female" {{ request('gender') === 'female' ? 'selected' : '' }}>Femme</option>
+                    <option value="other" {{ request('gender') === 'other' ? 'selected' : '' }}>Autre</option>
+                </select>
+            </div>
+            <div>
+                <select name="sort" class="form-select">
+                    <option value="created_at" {{ request('sort') === 'created_at' ? 'selected' : '' }}>Date d'inscription</option>
+                    <option value="first_name" {{ request('sort') === 'first_name' ? 'selected' : '' }}>Prénom</option>
+                    <option value="last_name" {{ request('sort') === 'last_name' ? 'selected' : '' }}>Nom</option>
+                    <option value="email" {{ request('sort') === 'email' ? 'selected' : '' }}>Email</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="btn-primary flex-1">
+                    <i class="fas fa-search mr-2"></i>
+                    Filtrer
+                </button>
+                <a href="{{ route('admin.members.index') }}" class="btn-secondary">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </form>
     </div>
 
     <!-- Stats Cards -->
@@ -89,106 +117,78 @@
         </div>
     </div>
 
-    <!-- Members Table -->
-    <div class="bg-white rounded-xl shadow overflow-hidden">
+        <!-- Tableau -->
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Membre
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Adhésion
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Statut
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Dernière visite
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Membre</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Adhésion</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inscription</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($members as $member)
-                        <tr class="hover:bg-gray-50 transition-colors">
+                        <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                        {{ substr($member->first_name, 0, 1) }}{{ substr($member->last_name, 0, 1) }}
+                                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                                        {{ strtoupper(substr($member->first_name, 0, 1) . substr($member->last_name, 0, 1)) }}
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $member->first_name }} {{ $member->last_name }}
-                                        </div>
-                                        <div class="text-sm text-gray-500">{{ $member->email }}</div>
-                                        <div class="text-xs text-gray-400">
-                                            Membre depuis {{ $member->created_at->format('d/m/Y') }}
-                                        </div>
+                                        <div class="font-medium text-gray-900">{{ $member->full_name }}</div>
+                                        <div class="text-sm text-gray-500">{{ $member->gender === 'male' ? 'Homme' : ($member->gender === 'female' ? 'Femme' : 'Autre') }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $member->membership->type ?? 'N/A' }}
-                                </div>
-                                <div class="text-sm text-gray-500">
-                                    @if($member->membership)
-                                        {{ $member->membership->start_date->format('d/m/Y') }} - 
-                                        {{ $member->membership->end_date->format('d/m/Y') }}
-                                    @else
-                                        Aucune adhésion
-                                    @endif
-                                </div>
+                                <div class="text-sm text-gray-900">{{ $member->email }}</div>
+                                <div class="text-sm text-gray-500">{{ $member->phone ?? 'N/A' }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $member->membership->type ?? 'Aucune' }}</div>
+                                @if($member->membership)
+                                    <div class="text-sm text-gray-500">{{ $member->membership->end_date?->format('d/m/Y') ?? 'N/A' }}</div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($member->membership)
-                                    @php
-                                        $statusColors = [
-                                            'active' => 'bg-green-100 text-green-800',
-                                            'expired' => 'bg-red-100 text-red-800',
-                                            'cancelled' => 'bg-yellow-100 text-yellow-800',
-                                            'pending' => 'bg-gray-100 text-gray-800'
-                                        ];
-                                        $statusColor = $statusColors[$member->membership->status] ?? 'bg-gray-100 text-gray-800';
-                                    @endphp
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
+                                    <span class="badge 
+                                        {{ $member->membership->status === 'active' ? 'badge-success' : '' }}
+                                        {{ $member->membership->status === 'expired' ? 'badge-danger' : '' }}
+                                        {{ $member->membership->status === 'cancelled' ? 'badge-warning' : '' }}
+                                        {{ $member->membership->status === 'pending' ? 'badge-info' : '' }}">
                                         {{ ucfirst($member->membership->status) }}
                                     </span>
                                 @else
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                        Sans adhésion
-                                    </span>
+                                    <span class="badge badge-warning">Sans adhésion</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                @php
-                                    $lastAttendance = $member->attendances()->latest()->first();
-                                @endphp
-                                @if($lastAttendance)
-                                    {{ $lastAttendance->check_in->format('d/m/Y H:i') }}
-                                @else
-                                    <span class="text-gray-400">Jamais</span>
-                                @endif
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $member->created_at->format('d/m/Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex items-center gap-2">
+                                <div class="flex space-x-2">
                                     <a href="{{ route('admin.members.show', $member) }}" class="text-blue-600 hover:text-blue-900" title="Voir">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.members.edit', $member) }}" class="text-green-600 hover:text-green-900" title="Modifier">
+                                    <a href="{{ route('admin.members.edit', $member) }}" class="text-indigo-600 hover:text-indigo-900" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{{ route('admin.attendance.record', ['member_id' => $member->id]) }}" class="text-purple-600 hover:text-purple-900" title="Enregistrer présence">
-                                        <i class="fas fa-door-open"></i>
+                                    <button onclick="openQuickPaymentModal({{ $member->id }}, '{{ $member->full_name }}', '{{ $member->email }}')" 
+                                            class="text-green-600 hover:text-green-900" title="Paiement rapide">
+                                        <i class="fas fa-credit-card"></i>
+                                    </button>
+                                    <a href="{{ route('admin.members.payments', $member) }}" class="text-purple-600 hover:text-purple-900" title="Historique des paiements">
+                                        <i class="fas fa-history"></i>
                                     </a>
-                                    <form action="{{ route('admin.members.destroy', $member) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce membre ?');">
+                                    <form action="{{ route('admin.members.destroy', $member) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900" title="Supprimer">
+                                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Supprimer ce membre ?')" title="Supprimer">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -215,45 +215,12 @@
         </div>
         
         <!-- Pagination -->
-        @if($members->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200">
-                {{ $members->links() }}
-            </div>
-        @endif
+        <div class="mt-6">
+            {{ $members->appends(request()->query())->links() }}
+        </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('search');
-        
-        if (searchInput) {
-            searchInput.addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') {
-                    const searchTerm = this.value.trim();
-                    if (searchTerm) {
-                        window.location.href = '{{ route("admin.members.index") }}?search=' + encodeURIComponent(searchTerm);
-                    } else {
-                        window.location.href = '{{ route("admin.members.index") }}';
-                    }
-                }
-            });
-        }
-        
-        // Filter by status if URL has status parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const statusParam = urlParams.get('status');
-        if (statusParam) {
-            const statusElements = document.querySelectorAll('[data-status]');
-            statusElements.forEach(el => {
-                if (el.dataset.status === statusParam) {
-                    el.classList.add('bg-blue-600', 'text-white');
-                    el.classList.remove('bg-gray-100', 'text-gray-800');
-                }
-            });
-        }
-    });
-</script>
+<!-- Inclure le modal de paiement rapide -->
+@include('components.quick-payment-modal')
 @endsection

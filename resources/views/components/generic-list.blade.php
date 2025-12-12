@@ -39,7 +39,7 @@
                     @foreach($items as $item)
                         <tr class="border-t">
                             @if(count($columns) > 0)
-                                @foreach($columns as $col)
+                                    @foreach($columns as $col)
                                     @php
                                         $val = data_get($item, $col);
                                         $display = '';
@@ -47,6 +47,9 @@
 
                                         // Detect timestamp-like columns
                                         $isTimeCol = preg_match('/(_at$|^check_in$|^check_out$|_time$)/', $col);
+                                        
+                                        // Detect date columns (birth_date, start_date, end_date, etc.)
+                                        $isDateCol = preg_match('/(_date$|^birth_date$|^start_date$|^end_date$)/', $col);
 
                                         if ($isTimeCol && $val) {
                                             try {
@@ -61,6 +64,13 @@
                                                 if (str_contains($col, 'created_at')) $bg = 'bg-gray-50 text-gray-700';
 
                                                 $displayHtml = '<span class="inline-flex items-baseline gap-2 px-2 py-1 rounded ' . $bg . '"><span class="text-sm font-medium">' . e($formatted) . '</span><span class="text-xs text-gray-500">(' . e($human) . ')</span></span>';
+                                            } catch (\Exception $e) {
+                                                $display = is_string($val) ? $val : json_encode($val);
+                                            }
+                                        } elseif ($isDateCol && $val) {
+                                            try {
+                                                $dt = \Carbon\Carbon::parse($val);
+                                                $display = $dt->format('d/m/Y');
                                             } catch (\Exception $e) {
                                                 $display = is_string($val) ? $val : json_encode($val);
                                             }
@@ -110,7 +120,11 @@
                             <td class="px-4 py-3">
                                 @php
                                     $isAttendance = isset($item->check_in) || array_key_exists('check_in', (array)$item);
+                                    $isCoach = isset($item->role) && $item->role === 'coach';
+                                    $isMember = isset($item->role) && $item->role === 'member';
+                                    $isProgram = isset($item->coach_id) && isset($item->title) && isset($item->level);
                                     $memberId = null;
+                                    
                                     if ($isAttendance) {
                                         $memberId = isset($item->user->id) ? $item->user->id : (data_get($item, 'user.id') ?? data_get($item, 'user_id'));
                                     }
@@ -130,10 +144,53 @@
                                             <i class="fas fa-sign-out-alt mr-2"></i>Check-out
                                         </button>
                                     @endif
+                                @elseif($isProgram && isset($item->id))
+                                    <a href="{{ route('admin.programs.show', $item->id) }}" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 mr-2">
+                                        <i class="fas fa-eye mr-2"></i>Voir
+                                    </a>
+                                    <a href="{{ route('admin.programs.edit', $item->id) }}" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 mr-2">
+                                        <i class="fas fa-edit mr-2"></i>Éditer
+                                    </a>
+                                    <form action="{{ route('admin.programs.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700">
+                                            <i class="fas fa-trash mr-2"></i>Supprimer
+                                        </button>
+                                    </form>
+                                @elseif($isCoach && isset($item->id))
+                                    <a href="{{ route('admin.coaches.show', $item->id) }}" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 mr-2">
+                                        <i class="fas fa-eye mr-2"></i>Voir
+                                    </a>
+                                    <a href="{{ route('admin.coaches.edit', $item->id) }}" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 mr-2">
+                                        <i class="fas fa-edit mr-2"></i>Éditer
+                                    </a>
+                                    <form action="{{ route('admin.coaches.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700">
+                                            <i class="fas fa-trash mr-2"></i>Supprimer
+                                        </button>
+                                    </form>
+                                @elseif($isMember && isset($item->id))
+                                    <a href="{{ route('admin.members.show', $item->id) }}" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 mr-2">
+                                        <i class="fas fa-eye mr-2"></i>Voir
+                                    </a>
+                                    <a href="{{ route('admin.members.edit', $item->id) }}" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 mr-2">
+                                        <i class="fas fa-edit mr-2"></i>Éditer
+                                    </a>
+                                    <a href="{{ route('admin.attendance.record', ['member_id' => $item->id]) }}" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-purple-600 rounded hover:bg-purple-700 mr-2">
+                                        <i class="fas fa-door-open mr-2"></i>Présence
+                                    </a>
+                                    <form action="{{ route('admin.members.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700">
+                                            <i class="fas fa-trash mr-2"></i>Supprimer
+                                        </button>
+                                    </form>
                                 @else
-                                    <a href="#" class="text-blue-600 mr-2">Voir</a>
-                                    <a href="#" class="text-green-600 mr-2">Éditer</a>
-                                    <a href="#" class="text-red-600">Supprimer</a>
+                                    <span class="text-gray-400 text-sm">Aucune action</span>
                                 @endif
                             </td>
                         </tr>
@@ -184,3 +241,4 @@
         }
     </script>
 @endsection
+

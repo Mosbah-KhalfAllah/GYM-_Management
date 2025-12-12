@@ -8,3 +8,4 @@
     <p>Formulaire d'édition — placeholder.</p>
 </div>
 @endsection
+

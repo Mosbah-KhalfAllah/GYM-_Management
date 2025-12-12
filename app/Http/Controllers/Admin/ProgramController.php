@@ -25,11 +25,15 @@ class ProgramController extends Controller
     {
         $validated = $request->validate([
             'coach_id' => 'required|exists:users,id',
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'title' => 'required|string|max:150|min:3',
+            'description' => 'nullable|string|max:1000',
             'level' => 'required|in:beginner,intermediate,advanced',
             'duration_days' => 'required|integer|min:1',
             'goal' => 'required|in:weight_loss,muscle_gain,endurance,flexibility',
+        ], [
+            'title.min' => 'Le titre doit contenir au moins 3 caractères.',
+            'title.max' => 'Le titre ne peut pas dépasser 150 caractères.',
+            'description.max' => 'La description ne peut pas dépasser 1000 caractères.',
         ]);
 
         WorkoutProgram::create(array_merge($validated, ['is_active' => true]));
@@ -53,12 +57,16 @@ class ProgramController extends Controller
     {
         $validated = $request->validate([
             'coach_id' => 'required|exists:users,id',
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'title' => 'required|string|max:150|min:3',
+            'description' => 'nullable|string|max:1000',
             'level' => 'required|in:beginner,intermediate,advanced',
             'duration_days' => 'required|integer|min:1',
             'goal' => 'required|in:weight_loss,muscle_gain,endurance,flexibility',
             'is_active' => 'boolean',
+        ], [
+            'title.min' => 'Le titre doit contenir au moins 3 caractères.',
+            'title.max' => 'Le titre ne peut pas dépasser 150 caractères.',
+            'description.max' => 'La description ne peut pas dépasser 1000 caractères.',
         ]);
 
         $program->update($validated);
@@ -71,5 +79,46 @@ class ProgramController extends Controller
         $program->update(['is_active' => false]);
         return redirect()->route('admin.programs.index')
             ->with('success', 'Programme désactivé avec succès.');
+    }
+
+    public function assignMemberForm(User $member)
+    {
+        $currentPrograms = $member->programs()->pluck('workout_programs.id')->toArray();
+        
+        $availablePrograms = WorkoutProgram::where('is_active', true)
+            ->whereNotIn('id', $currentPrograms)
+            ->with('coach')
+            ->get();
+        
+        $member->load('programs');
+        
+        return view('admin.programs.assign-member', compact('member', 'availablePrograms'));
+    }
+
+    public function assignMember(Request $request, User $member)
+    {
+        $programId = $request->input('program_id');
+        
+        // Vérifier que le programme existe et est actif
+        $program = WorkoutProgram::findOrFail($programId);
+        if (!$program->is_active) {
+            abort(403, 'Ce programme n\'est pas actif.');
+        }
+        
+        // Vérifier que le programme n'est pas déjà assigné
+        if ($member->programs()->where('program_id', $programId)->exists()) {
+            return redirect()->route('admin.programs.assignMemberForm', $member->id)
+                ->with('error', 'Ce programme est déjà assigné au membre.');
+        }
+        
+        // Assigner le programme
+        $member->programs()->attach($programId, [
+            'status' => 'active',
+            'current_day' => 1,
+            'completion_percentage' => 0,
+        ]);
+        
+        return redirect()->route('admin.members.show', $member->id)
+            ->with('success', 'Programme assigné avec succès.');
     }
 }

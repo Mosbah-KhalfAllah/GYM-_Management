@@ -14,16 +14,16 @@
             @csrf
 
             <div class="grid grid-cols-2 gap-4">
-                <x-form-field label="Prénom" name="first_name" type="text" placeholder="Ex: Jean" required />
-                <x-form-field label="Nom" name="last_name" type="text" placeholder="Ex: Dupont" required />
+                <x-form-field label="Prénom" name="first_name" type="text" placeholder="Ex: Jean" pattern="^[a-zA-ZÀ-ÿ\s'\-]+$" title="Le prénom ne doit contenir que des lettres" required />
+                <x-form-field label="Nom" name="last_name" type="text" placeholder="Ex: Dupont" pattern="^[a-zA-ZÀ-ÿ\s'\-]+$" title="Le nom ne doit contenir que des lettres" required />
             </div>
 
             <x-form-field label="Email" name="email" type="email" placeholder="coach@gym.com" required />
-            <x-form-field label="Téléphone" name="phone" type="tel" placeholder="06 12 34 56 78" />
-            <x-form-field label="Spécialisation" name="specialization" type="text" placeholder="Ex: CrossFit, Yoga, Musculation" />
-            <x-form-field label="Années d'expérience" name="experience_years" type="number" min="0" />
-            <x-form-field label="Mot de passe" name="password" type="password" placeholder="Min. 8 caractères" required />
-            <x-form-field label="Confirmer le mot de passe" name="password_confirmation" type="password" placeholder="Répétez le mot de passe" required />
+            <x-form-field label="Téléphone" name="phone" type="tel" pattern="^[\d\s\+\-\(\)]+$" placeholder="06 12 34 56 78" />
+            <x-form-field label="Spécialisation" name="specialization" type="text" maxlength="100" placeholder="Ex: CrossFit, Yoga, Musculation" />
+            <x-form-field label="Années d'expérience" name="experience_years" type="number" min="0" max="60" />
+            <x-form-field label="Mot de passe" name="password" type="password" minlength="8" placeholder="Min. 8 caractères" required />
+            <x-form-field label="Confirmer le mot de passe" name="password_confirmation" type="password" minlength="8" placeholder="Répétez le mot de passe" required />
 
             <div class="flex gap-3 pt-4">
                 <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Créer le coach</button>
@@ -33,3 +33,4 @@
     </div>
 </div>
 @endsection
+

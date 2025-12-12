@@ -8,3 +8,4 @@
     <p>Informations équipement — placeholder.</p>
 </div>
 @endsection
+

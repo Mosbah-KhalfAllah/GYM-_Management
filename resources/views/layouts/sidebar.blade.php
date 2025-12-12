@@ -55,6 +55,10 @@
                     <i class="fas fa-chart-bar"></i>
                     <span>Rapports</span>
                 </a><br>
+                <a href="{{ route('admin.inquiries.index') }}" class="sidebar-item {{ request()->routeIs('admin.inquiries.*') ? 'active' : '' }}">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Demandes</span>
+                </a><br>
                 <a href="{{ route('admin.settings.index') }}" class="sidebar-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                     <i class="fas fa-cog"></i>
                     <span>Paramètres</span>
@@ -98,31 +102,31 @@
                 <a href="{{ route('member.dashboard') }}" class="sidebar-item {{ request()->routeIs('member.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Tableau de bord</span>
-                </a>
+                </a><br>
                 <a href="{{ route('member.program.index') }}" class="sidebar-item {{ request()->routeIs('member.program.*') ? 'active' : '' }}">
                     <i class="fas fa-running"></i>
                     <span>Mon Programme</span>
-                </a>
+                </a><br>
                 <a href="{{ route('member.workout.index') }}" class="sidebar-item {{ request()->routeIs('member.workout.*') ? 'active' : '' }}">
                     <i class="fas fa-dumbbell"></i>
                     <span>Séance du jour</span>
-                </a>
+                </a><br>
                 <a href="{{ route('member.classes.index') }}" class="sidebar-item {{ request()->routeIs('member.classes.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Cours collectifs</span>
-                </a>
+                </a><br>
                 <a href="{{ route('member.attendance.index') }}" class="sidebar-item {{ request()->routeIs('member.attendance.*') ? 'active' : '' }}">
                     <i class="fas fa-history"></i>
                     <span>Mes présences</span>
-                </a>
+                </a><br>
                 <a href="{{ route('member.challenges.index') }}" class="sidebar-item {{ request()->routeIs('member.challenges.*') ? 'active' : '' }}">
                     <i class="fas fa-trophy"></i>
                     <span>Challenges</span>
-                </a>
+                </a><br>
                 <a href="{{ route('member.progress.index') }}" class="sidebar-item {{ request()->routeIs('member.progress.*') ? 'active' : '' }}">
                     <i class="fas fa-chart-line"></i>
                     <span>Progression</span>
-                </a>
+                </a><br>
                 <a href="{{ route('member.profile.index') }}" class="sidebar-item {{ request()->routeIs('member.profile.*') ? 'active' : '' }}">
                     <i class="fas fa-user-circle"></i>
                     <span>Mon Profil</span>

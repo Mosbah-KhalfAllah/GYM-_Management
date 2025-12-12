@@ -21,8 +21,12 @@
                         <span class="ml-3 text-2xl font-bold text-gray-900">GYM PRO</span>
                     </div>
                 </div>
-                <div class="flex items-center">
-                    <a href="{{ route('login') }}" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ route('inquiry.create') }}" class="inline-flex items-center px-4 py-2 border border-blue-500 text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-all duration-200">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        Renseignements
+                    </a>
+                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200">
                         <i class="fas fa-sign-in-alt mr-2"></i>
                         Se connecter
                     </a>
@@ -30,6 +34,29 @@
             </div>
         </div>
     </nav>
+
+    <!-- Message de succès -->
+    @if(session('inquiry_success'))
+        <div id="inquiry-alert" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 transition-opacity duration-500">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-3 text-lg"></i>
+                    <p class="font-medium">{{ session('inquiry_success') }}</p>
+                </div>
+                <button onclick="closeAlert()" class="text-green-700 hover:text-green-900">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <script>
+            function closeAlert() {
+                const alert = document.getElementById('inquiry-alert');
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }
+            setTimeout(closeAlert, 5000);
+        </script>
+    @endif
 
     <!-- Hero Section -->
     <div class="relative overflow-hidden">

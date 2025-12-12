@@ -8,3 +8,4 @@
     @include('components.generic-list', ['items' => $attendances ?? null])
 </div>
 @endsection
+

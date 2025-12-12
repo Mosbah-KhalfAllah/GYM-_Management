@@ -13,19 +13,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm text-gray-700">Titre</label>
-                    <input name="title" class="mt-1 block w-full rounded border-gray-300 px-3 py-2" value="{{ old('title', $program->title) }}">
+                    <input name="title" required maxlength="150" minlength="3" @error('title') class="mt-1 block w-full rounded !border !border-red-500 px-3 py-2" @else class="mt-1 block w-full rounded border border-gray-300 px-3 py-2" @enderror value="{{ old('title', $program->title) }}" placeholder="Nom du programme">
                     @error('title')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="block text-sm text-gray-700">Durée (semaines)</label>
-                    <input name="duration_weeks" type="number" class="mt-1 block w-full rounded border-gray-300 px-3 py-2" value="{{ old('duration_weeks', $program->duration_weeks) }}">
+                    <input name="duration_weeks" type="number" required min="1" max="52" @error('duration_weeks') class="mt-1 block w-full rounded !border !border-red-500 px-3 py-2" @else class="mt-1 block w-full rounded border border-gray-300 px-3 py-2" @enderror value="{{ old('duration_weeks', $program->duration_weeks) }}">
                     @error('duration_weeks')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
                 </div>
             </div>
 
             <div class="mt-4">
                 <label class="block text-sm text-gray-700">Description</label>
-                <textarea name="description" rows="4" class="mt-1 block w-full rounded border-gray-300 px-3 py-2">{{ old('description', $program->description) }}</textarea>
+                <textarea name="description" rows="4" maxlength="1000" @error('description') class="mt-1 block w-full rounded !border !border-red-500 px-3 py-2" @else class="mt-1 block w-full rounded border border-gray-300 px-3 py-2" @enderror placeholder="Décrivez votre programme...">{{ old('description', $program->description) }}</textarea>
                 @error('description')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
             </div>
 
@@ -37,3 +37,4 @@
     </div>
 </div>
 @endsection
+

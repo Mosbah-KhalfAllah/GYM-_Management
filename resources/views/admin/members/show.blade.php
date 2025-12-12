@@ -220,19 +220,15 @@
                 <div class="space-y-3">
                     <a href="{{ route('admin.attendance.record', ['member_id' => $member->id]) }}" class="block w-full px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-center font-medium">
                         <i class="fas fa-door-open mr-2"></i>
-                        Scanner présence
+                        Enregistrer présence
                     </a>
-                    <a href="#" class="block w-full px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-center font-medium">
+                    <a href="{{ route('admin.payments.create') }}?member_id={{ $member->id }}" class="block w-full px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-center font-medium">
                         <i class="fas fa-credit-card mr-2"></i>
                         Enregistrer paiement
                     </a>
-                    <a href="#" class="block w-full px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors text-center font-medium">
+                    <a href="{{ route('admin.programs.assignMemberForm', $member->id) }}" class="block w-full px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors text-center font-medium">
                         <i class="fas fa-dumbbell mr-2"></i>
                         Assigner programme
-                    </a>
-                    <a href="#" class="block w-full px-4 py-3 bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition-colors text-center font-medium">
-                        <i class="fas fa-envelope mr-2"></i>
-                        Envoyer message
                     </a>
                 </div>
             </div>

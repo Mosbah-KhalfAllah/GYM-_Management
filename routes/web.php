@@ -13,10 +13,11 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Authentication Routes
+// Authentication Routes avec rate limiting
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:5,1'); // 5 tentatives par minute
 });
 
 Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
@@ -41,24 +42,22 @@ Route::get('/dashboard', function () {
     }
 })->middleware('auth')->name('dashboard');
 
-// Admin Routes - Version simplifiée (sans middleware 'role')
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        if (Auth::user()->role !== 'admin') {
-            return redirect()->route('dashboard');
-        }
-        return app(AdminDashboardController::class)->index();
-    })->name('dashboard');
+// Admin Routes - Avec middleware role
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
     // Members
     Route::resource('members', \App\Http\Controllers\Admin\MemberController::class);
     Route::get('members/{member}/attendance', [\App\Http\Controllers\Admin\MemberController::class, 'generateQrCode'])->name('members.attendance');
+    Route::get('members/{member}/quick-payment', [\App\Http\Controllers\Admin\PaymentController::class, 'create'])->name('members.quick-payment');
     
     // Coaches
     Route::resource('coaches', \App\Http\Controllers\Admin\CoachController::class);
     
     // Programs
     Route::resource('programs', \App\Http\Controllers\Admin\ProgramController::class);
+    Route::get('members/{member}/assign-program', [\App\Http\Controllers\Admin\ProgramController::class, 'assignMemberForm'])->name('programs.assignMemberForm');
+    Route::post('members/{member}/assign-program', [\App\Http\Controllers\Admin\ProgramController::class, 'assignMember'])->name('programs.assignMember');
     
     // Classes
     Route::resource('classes', \App\Http\Controllers\Admin\ClassController::class);
@@ -75,6 +74,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     
     // Payments
     Route::resource('payments', \App\Http\Controllers\Admin\PaymentController::class);
+    Route::post('payments/quick', [\App\Http\Controllers\Admin\PaymentController::class, 'quickPayment'])->name('payments.quick');
+    Route::get('members/{member}/payments', [\App\Http\Controllers\Admin\PaymentController::class, 'memberPayments'])->name('members.payments');
+    Route::get('payments-help', function() { return view('admin.payments.help'); })->name('payments.help');
     
     // Challenges
     Route::resource('challenges', \App\Http\Controllers\Admin\ChallengeController::class);
@@ -86,16 +88,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // Settings
     Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::put('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    
+    // Inquiries
+    Route::get('inquiries', [\App\Http\Controllers\Admin\InquiryController::class, 'index'])->name('inquiries.index');
+    Route::get('inquiries/{inquiry}', [\App\Http\Controllers\Admin\InquiryController::class, 'show'])->name('inquiries.show');
+    Route::patch('inquiries/{inquiry}/status', [\App\Http\Controllers\Admin\InquiryController::class, 'updateStatus'])->name('inquiries.update-status');
+    Route::delete('inquiries/{inquiry}', [\App\Http\Controllers\Admin\InquiryController::class, 'destroy'])->name('inquiries.destroy');
 });
 
-// Coach Routes - Version simplifiée (sans middleware 'role')
-Route::prefix('coach')->name('coach.')->middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        if (Auth::user()->role !== 'coach') {
-            return redirect()->route('dashboard');
-        }
-        return app(CoachDashboardController::class)->index();
-    })->name('dashboard');
+// Coach Routes - Avec middleware role
+Route::prefix('coach')->name('coach.')->middleware(['auth', 'role:coach'])->group(function () {
+    Route::get('/dashboard', [CoachDashboardController::class, 'index'])->name('dashboard');
     
     // Members
     Route::get('members', [\App\Http\Controllers\Coach\MemberController::class, 'index'])->name('members.index');
@@ -128,14 +131,9 @@ Route::prefix('coach')->name('coach.')->middleware(['auth'])->group(function () 
     Route::get('schedule', [\App\Http\Controllers\Coach\ScheduleController::class, 'index'])->name('schedule.index');
 });
 
-// Member Routes - Version simplifiée (sans middleware 'role')
-Route::prefix('member')->name('member.')->middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        if (Auth::user()->role !== 'member') {
-            return redirect()->route('dashboard');
-        }
-        return app(MemberDashboardController::class)->index();
-    })->name('dashboard');
+// Member Routes - Avec middleware role
+Route::prefix('member')->name('member.')->middleware(['auth', 'role:member'])->group(function () {
+    Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
     
     // Program
     Route::get('program', [\App\Http\Controllers\Member\ProgramController::class, 'index'])->name('program.index');
@@ -166,6 +164,8 @@ Route::prefix('member')->name('member.')->middleware(['auth'])->group(function (
     // Profile
     Route::get('profile', [\App\Http\Controllers\Member\ProfileController::class, 'index'])->name('profile.index');
     Route::put('profile', [\App\Http\Controllers\Member\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('profile/password', [\App\Http\Controllers\Member\ProfileController::class, 'updatePassword'])->name('profile.update-password');
+    Route::put('profile/membership', [\App\Http\Controllers\Member\ProfileController::class, 'updateMembership'])->name('profile.update-membership');
     
     // Attendance (Self-service check-in)
     Route::get('attendance/qrcode', [\App\Http\Controllers\Member\QrCodeController::class, 'show'])->name('member.attendance');
@@ -182,6 +182,12 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
+// Demandes de renseignements
+Route::get('/demande-renseignements', [\App\Http\Controllers\InquiryController::class, 'create'])->name('inquiry.create');
+Route::post('/demande-renseignements', [\App\Http\Controllers\InquiryController::class, 'store'])
+    ->middleware('throttle:3,10') // 3 demandes par 10 minutes
+    ->name('inquiry.store');
+
 // Profile Routes (pour tous les utilisateurs)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -189,4 +195,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/profile/password', [ProfileController::class, 'password'])->name('password.edit');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
 });

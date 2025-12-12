@@ -49,15 +49,35 @@ class ProfileController extends Controller
         $user = Auth::user();
         
         $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
+            'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'birth_date' => ['nullable', 'date'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/'],
+            'birth_date' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(10)->toDateString(), 'after:1920-01-01'],
             'gender' => ['nullable', 'string', 'in:male,female,other'],
             'address' => ['nullable', 'string', 'max:500'],
-            'emergency_contact' => ['nullable', 'string', 'max:20'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
+            'emergency_contact' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/'],
+            'avatar' => ['nullable', 'image', 'max:10240'],
+        ], [
+            'first_name.required' => 'Le prénom est requis.',
+            'first_name.regex' => 'Le prénom ne doit contenir que des lettres, espaces, tirets et apostrophes.',
+            'first_name.max' => 'Le prénom ne doit pas dépasser 255 caractères.',
+            'last_name.required' => 'Le nom est requis.',
+            'last_name.regex' => 'Le nom ne doit contenir que des lettres, espaces, tirets et apostrophes.',
+            'last_name.max' => 'Le nom ne doit pas dépasser 255 caractères.',
+            'email.required' => 'L\'email est requis.',
+            'email.email' => 'L\'email doit être une adresse valide.',
+            'email.unique' => 'Cet email est déjà utilisé.',
+            'phone.regex' => 'Le téléphone doit contenir uniquement des chiffres et caractères spéciaux (+, -, parenthèses).',
+            'phone.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'birth_date.date' => 'La date de naissance doit être une date valide.',
+            'birth_date.before_or_equal' => 'L\'âge minimum requis est 10 ans.',
+            'birth_date.after' => 'La date de naissance doit être après 1920.',
+            'address.max' => 'L\'adresse ne doit pas dépasser 500 caractères.',
+            'emergency_contact.regex' => 'Le numéro d\'urgence doit contenir uniquement des chiffres et caractères spéciaux.',
+            'emergency_contact.max' => 'Le numéro d\'urgence ne doit pas dépasser 20 caractères.',
+            'avatar.image' => 'Le fichier doit être une image valide (JPG, PNG, GIF).',
+            'avatar.max' => 'La photo ne doit pas dépasser 10MB.',
         ]);
         
         // Gestion de l'avatar

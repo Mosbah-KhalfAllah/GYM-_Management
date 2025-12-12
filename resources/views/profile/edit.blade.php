@@ -15,44 +15,72 @@
         @method('PATCH')
 
         <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Prénom</label>
-                <input type="text" name="first_name" value="{{ old('first_name', $user->first_name ?? '') }}" class="mt-1 block w-full rounded border-gray-300">
-                @error('first_name')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
-            </div>
+            <x-form-field
+                name="first_name"
+                label="Prénom"
+                :value="$user->first_name ?? ''"
+                required="true"
+                pattern="^[a-zA-ZÀ-ÿ\s'\-]+$"
+                maxlength="100"
+                title="Le prénom ne doit contenir que des lettres"
+                :error="$errors->first('first_name')"
+            />
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Nom</label>
-                <input type="text" name="last_name" value="{{ old('last_name', $user->last_name ?? '') }}" class="mt-1 block w-full rounded border-gray-300">
-                @error('last_name')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
-            </div>
+            <x-form-field
+                name="last_name"
+                label="Nom"
+                :value="$user->last_name ?? ''"
+                required="true"
+                pattern="^[a-zA-ZÀ-ÿ\s'\-]+$"
+                maxlength="100"
+                title="Le nom ne doit contenir que des lettres"
+                :error="$errors->first('last_name')"
+            />
         </div>
 
-        <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}" class="mt-1 block w-full rounded border-gray-300">
-            @error('email')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
-        </div>
+        <x-form-field
+            name="email"
+            label="Email"
+            type="email"
+            :value="$user->email ?? ''"
+            required="true"
+            maxlength="255"
+            title="Adresse email valide"
+            :error="$errors->first('email')"
+        />
 
         <div class="mt-4 grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Téléphone</label>
-                <input type="text" name="phone" value="{{ old('phone', $user->phone ?? '') }}" class="mt-1 block w-full rounded border-gray-300">
-                @error('phone')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
-            </div>
+            <x-form-field
+                name="phone"
+                label="Téléphone"
+                type="tel"
+                :value="$user->phone ?? ''"
+                pattern="^[\d\s\+\-\(\)]+$"
+                maxlength="20"
+                placeholder="06 12 34 56 78"
+                :error="$errors->first('phone')"
+            />
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Date de naissance</label>
-                <input type="date" name="birth_date" value="{{ old('birth_date', optional($user->birth_date)->format('Y-m-d') ?? '') }}" class="mt-1 block w-full rounded border-gray-300">
-                @error('birth_date')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
-            </div>
+            <x-form-field
+                name="birth_date"
+                label="Date de naissance"
+                type="date"
+                :value="optional($user->birth_date)->format('Y-m-d') ?? ''"
+                :max="now()->subYears(10)->format('Y-m-d')"
+                min="1920-01-01"
+                :error="$errors->first('birth_date')"
+                help="L'age minimum requis est 10 ans, date minimale: 01-01-1920"
+            />
         </div>
 
-        <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700">Adresse</label>
-            <textarea name="address" class="mt-1 block w-full rounded border-gray-300">{{ old('address', $user->address ?? '') }}</textarea>
-            @error('address')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
-        </div>
+        <x-form-field
+            name="address"
+            label="Adresse"
+            type="textarea"
+            :value="$user->address ?? ''"
+            maxlength="1000"
+            :error="$errors->first('address')"
+        />
 
         <div class="mt-4 flex items-center justify-between">
             <a href="{{ route('password.edit') }}" class="text-blue-600">Changer le mot de passe</a>
@@ -65,13 +93,17 @@
     <form action="{{ route('profile.destroy') }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer votre compte ?');">
         @csrf
         @method('DELETE')
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Mot de passe (confirmation avant suppression)</label>
-            <input type="password" name="password" class="mt-1 block w-full rounded border-gray-300">
-        </div>
+        <x-form-field
+            name="password"
+            label="Mot de passe (confirmation avant suppression)"
+            type="password"
+            required="true"
+            :error="$errors->first('password')"
+        />
         <div class="mt-4">
             <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded">Supprimer mon compte</button>
         </div>
     </form>
 </div>
 @endsection
+

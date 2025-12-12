@@ -6,3 +6,4 @@
     <p class="text-gray-700">Pour toute question, contactez l'administrateur du site à <a href="mailto:admin@example.com" class="text-blue-600">admin@example.com</a>.</p>
 </div>
 @endsection
+

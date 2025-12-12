@@ -13,12 +13,40 @@ class MemberController extends Controller
     /**
      * Display a listing of the members.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $members = User::where('role', 'member')
-            ->with('membership')
-            ->latest()
-            ->paginate(10);
+        $query = User::where('role', 'member')
+            ->with('membership');
+        
+        // Recherche
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtre par statut d'adhésion
+        if ($request->filled('status')) {
+            $query->whereHas('membership', function($q) use ($request) {
+                $q->where('status', $request->status);
+            });
+        }
+
+        // Filtre par genre
+        if ($request->filled('gender')) {
+            $query->where('gender', $request->gender);
+        }
+
+        // Tri
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+        $query->orderBy($sort, $direction);
+
+        $members = $query->paginate(15);
         
         return view('admin.members.index', compact('members'));
     }
@@ -37,15 +65,36 @@ class MemberController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
+            'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'nullable|string|max:20',
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/'],
             'password' => 'required|string|min:8|confirmed',
-            'birth_date' => 'nullable|date',
+            'birth_date' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(10)->toDateString(), 'after:1920-01-01'],
             'gender' => 'nullable|string|in:male,female,other',
             'address' => 'nullable|string|max:500',
-            'emergency_contact' => 'nullable|string|max:20',
+            'emergency_contact' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/'],
+        ], [
+            'first_name.required' => 'Le prénom est requis.',
+            'first_name.regex' => 'Le prénom ne doit contenir que des lettres, espaces, tirets et apostrophes.',
+            'first_name.max' => 'Le prénom ne doit pas dépasser 255 caractères.',
+            'last_name.required' => 'Le nom est requis.',
+            'last_name.regex' => 'Le nom ne doit contenir que des lettres, espaces, tirets et apostrophes.',
+            'last_name.max' => 'Le nom ne doit pas dépasser 255 caractères.',
+            'email.required' => 'L\'email est requis.',
+            'email.email' => 'L\'email doit être une adresse valide.',
+            'email.unique' => 'Cet email est déjà utilisé.',
+            'phone.regex' => 'Le téléphone doit contenir uniquement des chiffres et caractères spéciaux (+, -, parenthèses).',
+            'phone.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'password.required' => 'Le mot de passe est requis.',
+            'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+            'birth_date.date' => 'La date de naissance doit être une date valide.',
+            'birth_date.before_or_equal' => 'L\'âge minimum requis est 10 ans.',
+            'birth_date.after' => 'La date de naissance doit être après 1920.',
+            'address.max' => 'L\'adresse ne doit pas dépasser 500 caractères.',
+            'emergency_contact.regex' => 'Le numéro d\'urgence doit contenir uniquement des chiffres et caractères spéciaux.',
+            'emergency_contact.max' => 'Le numéro d\'urgence ne doit pas dépasser 20 caractères.',
         ]);
 
         // Create user
@@ -115,15 +164,33 @@ class MemberController extends Controller
         }
 
         $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
+            'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÿ\s\'-]+$/'],
             'email' => 'required|string|email|max:255|unique:users,email,' . $member->id,
-            'phone' => 'nullable|string|max:20',
-            'birth_date' => 'nullable|date',
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/'],
+            'birth_date' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(10)->toDateString(), 'after:1920-01-01'],
             'gender' => 'nullable|string|in:male,female,other',
             'address' => 'nullable|string|max:500',
-            'emergency_contact' => 'nullable|string|max:20',
+            'emergency_contact' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/'],
             'is_active' => 'boolean',
+        ], [
+            'first_name.required' => 'Le prénom est requis.',
+            'first_name.regex' => 'Le prénom ne doit contenir que des lettres, espaces, tirets et apostrophes.',
+            'first_name.max' => 'Le prénom ne doit pas dépasser 255 caractères.',
+            'last_name.required' => 'Le nom est requis.',
+            'last_name.regex' => 'Le nom ne doit contenir que des lettres, espaces, tirets et apostrophes.',
+            'last_name.max' => 'Le nom ne doit pas dépasser 255 caractères.',
+            'email.required' => 'L\'email est requis.',
+            'email.email' => 'L\'email doit être une adresse valide.',
+            'email.unique' => 'Cet email est déjà utilisé.',
+            'phone.regex' => 'Le téléphone doit contenir uniquement des chiffres et caractères spéciaux (+, -, parenthèses).',
+            'phone.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'birth_date.date' => 'La date de naissance doit être une date valide.',
+            'birth_date.before_or_equal' => 'L\'âge minimum requis est 10 ans.',
+            'birth_date.after' => 'La date de naissance doit être après 1920.',
+            'address.max' => 'L\'adresse ne doit pas dépasser 500 caractères.',
+            'emergency_contact.regex' => 'Le numéro d\'urgence doit contenir uniquement des chiffres et caractères spéciaux.',
+            'emergency_contact.max' => 'Le numéro d\'urgence ne doit pas dépasser 20 caractères.',
         ]);
 
         $member->update($validated);

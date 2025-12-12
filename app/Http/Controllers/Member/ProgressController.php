@@ -294,8 +294,12 @@ class ProgressController extends Controller
             ->map(function ($program) {
                 return [
                     'title' => $program->title,
-                    'start_date' => $program->pivot->start_date->format('d/m/Y'),
-                    'end_date' => $program->pivot->end_date->format('d/m/Y'),
+                    'start_date' => is_string($program->pivot->start_date) 
+                        ? \Carbon\Carbon::parse($program->pivot->start_date)->format('d/m/Y')
+                        : $program->pivot->start_date->format('d/m/Y'),
+                    'end_date' => is_string($program->pivot->end_date)
+                        ? \Carbon\Carbon::parse($program->pivot->end_date)->format('d/m/Y')
+                        : $program->pivot->end_date->format('d/m/Y'),
                     'progress' => $program->pivot->completion_percentage,
                     'status' => $program->pivot->status,
                     'duration' => $program->duration_days,

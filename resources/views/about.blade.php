@@ -6,3 +6,4 @@
     <p class="text-gray-700">Bienvenue sur l'application de gestion du gym. Cette application permet de gérer les membres, les coachs, les programmes et les présences.</p>
 </div>
 @endsection
+

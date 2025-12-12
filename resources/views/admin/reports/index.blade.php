@@ -24,3 +24,4 @@
     @include('components.generic-list', ['items' => $attendanceData ?? null])
 </div>
 @endsection
+

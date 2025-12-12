@@ -133,11 +133,11 @@
                                     <tr class="@if($entry->member_id === auth()->id()) bg-indigo-50 @endif">
                                         <td class="px-4 py-3 text-sm font-medium text-gray-900">
                                             @if($index == 0)
-                                                <span class="inline-block w-6 h-6 rounded-full bg-yellow-400 text-white flex items-center justify-center text-xs">🥇</span>
+                                                <span class="flex w-6 h-6 rounded-full bg-yellow-400 text-white items-center justify-center text-xs">🥇</span>
                                             @elseif($index == 1)
-                                                <span class="inline-block w-6 h-6 rounded-full bg-gray-400 text-white flex items-center justify-center text-xs">🥈</span>
+                                                <span class="flex w-6 h-6 rounded-full bg-gray-400 text-white items-center justify-center text-xs">🥈</span>
                                             @elseif($index == 2)
-                                                <span class="inline-block w-6 h-6 rounded-full bg-orange-400 text-white flex items-center justify-center text-xs">🥉</span>
+                                                <span class="flex w-6 h-6 rounded-full bg-orange-400 text-white items-center justify-center text-xs">🥉</span>
                                             @else
                                                 {{ $index + 1 }}
                                             @endif
@@ -240,3 +240,4 @@
     </div>
 </div>
 @endsection
+

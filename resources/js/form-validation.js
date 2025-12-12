@@ -1,173 +1,255 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Validation des formulaires en temps réel
-    const forms = document.querySelectorAll('form');
+/**
+ * Advanced Form Validation System
+ * Validates all forms with real-time feedback and visual indicators
+ */
 
-    forms.forEach(form => {
+class FormValidator {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        document.addEventListener('DOMContentLoaded', () => {
+            this.setupAllForms();
+        });
+    }
+
+    setupAllForms() {
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => this.setupForm(form));
+    }
+
+    setupForm(form) {
         const inputs = form.querySelectorAll('input, textarea, select');
-
+        
         inputs.forEach(input => {
-            // Validation au blur (perte de focus)
-            input.addEventListener('blur', function() {
-                validateField(this, form);
+            if (input.type === 'hidden' || input.type === 'submit' || input.type === 'button') {
+                return;
+            }
+
+            // Real-time validation on blur
+            input.addEventListener('blur', () => this.validateField(input));
+
+            // Real-time validation on input (with debounce)
+            let validationTimeout;
+            input.addEventListener('input', () => {
+                clearTimeout(validationTimeout);
+                validationTimeout = setTimeout(() => this.validateField(input), 300);
             });
 
-            // Validation à la saisie (debounced)
-            input.addEventListener('input', function() {
-                clearTimeout(this.validationTimeout);
-                this.validationTimeout = setTimeout(() => {
-                    validateField(this, form);
-                }, 500);
-            });
-
-            // Validation au change (pour selects et checkboxes)
-            input.addEventListener('change', function() {
-                validateField(this, form);
-            });
+            // Validation on change
+            input.addEventListener('change', () => this.validateField(input));
         });
 
-        // Validation au submit
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
-            inputs.forEach(input => {
-                if (!validateField(input, form)) {
-                    isValid = false;
-                }
-            });
-
-            if (!isValid) {
+        // Form submit validation
+        form.addEventListener('submit', (e) => {
+            if (!this.validateForm(form)) {
                 e.preventDefault();
-                showAlert('Veuillez corriger les erreurs du formulaire', 'error');
+                this.showAlert('Veuillez corriger les erreurs dans le formulaire', 'error');
             }
         });
-    });
+    }
 
-    function validateField(field, form) {
-        const fieldName = field.name;
-        const fieldValue = field.value.trim();
+    validateField(field) {
+        const value = field.value.trim();
         const fieldType = field.type;
+        const fieldName = field.name || field.id;
         const isRequired = field.hasAttribute('required');
+        const minLength = field.getAttribute('minlength');
+        const maxLength = field.getAttribute('maxlength');
+        const pattern = field.getAttribute('pattern');
+        const min = field.getAttribute('min');
+        const max = field.getAttribute('max');
+        
         let errorMessage = '';
 
-        // Réinitialiser le champ
-        removeFieldError(field);
-
-        // Vérification de la saisie obligatoire
-        if (isRequired && !fieldValue) {
-            errorMessage = `${fieldName} est obligatoire`;
+        // Check required
+        if (isRequired && !value) {
+            errorMessage = 'Ce champ est obligatoire';
+            this.showFieldError(field, errorMessage);
+            return false;
         }
 
-        // Validations spécifiques par type
-        if (!errorMessage && fieldValue) {
-            switch (fieldType) {
-                case 'email':
-                    if (!isValidEmail(fieldValue)) {
-                        errorMessage = 'Email invalide';
-                    }
-                    break;
-                case 'number':
-                    if (isNaN(fieldValue)) {
-                        errorMessage = 'Veuillez entrer un nombre valide';
-                    }
-                    break;
-                case 'tel':
-                    if (!/^[\d\s\-\+\(\)]+$/.test(fieldValue) || fieldValue.length < 10) {
-                        errorMessage = 'Numéro de téléphone invalide';
-                    }
-                    break;
-                case 'date':
-                    if (!isValidDate(fieldValue)) {
-                        errorMessage = 'Date invalide';
-                    }
-                    break;
-                case 'password':
-                    if (fieldValue.length < 6) {
-                        errorMessage = 'Le mot de passe doit contenir au moins 6 caractères';
-                    }
-                    break;
-                case 'text':
-                    if (fieldName.includes('email') && !isValidEmail(fieldValue)) {
-                        errorMessage = 'Email invalide';
-                    }
-                    break;
-            }
+        // Skip validation if empty and not required
+        if (!isRequired && !value) {
+            this.clearFieldError(field);
+            this.showFieldSuccess(field);
+            return true;
         }
 
-        // Affichage de l'erreur
+        // Type-specific validation
+        switch (fieldType) {
+            case 'email':
+                if (!this.isValidEmail(value)) {
+                    errorMessage = 'Adresse email invalide';
+                }
+                break;
+            case 'tel':
+                if (!this.isValidPhone(value)) {
+                    errorMessage = 'Numéro de téléphone invalide (minimum 10 chiffres)';
+                }
+                break;
+            case 'number':
+                if (isNaN(value)) {
+                    errorMessage = 'Doit être un nombre valide';
+                } else {
+                    if (min && parseInt(value) < parseInt(min)) {
+                        errorMessage = `Minimum: ${min}`;
+                    }
+                    if (max && parseInt(value) > parseInt(max)) {
+                        errorMessage = `Maximum: ${max}`;
+                    }
+                }
+                break;
+            case 'date':
+                if (!this.isValidDate(value)) {
+                    errorMessage = 'Date invalide';
+                }
+                break;
+            case 'password':
+                if (value.length < 6) {
+                    errorMessage = 'Le mot de passe doit contenir au moins 6 caractères';
+                }
+                break;
+            case 'url':
+                if (!this.isValidUrl(value)) {
+                    errorMessage = 'URL invalide';
+                }
+                break;
+            case 'text':
+                // Check if it's meant to be email
+                if (fieldName.toLowerCase().includes('email') && value && !this.isValidEmail(value)) {
+                    errorMessage = 'Email invalide';
+                }
+                break;
+        }
+
+        // Check length constraints
+        if (!errorMessage && minLength && value.length < parseInt(minLength)) {
+            errorMessage = `Minimum ${minLength} caractères`;
+        }
+        if (!errorMessage && maxLength && value.length > parseInt(maxLength)) {
+            errorMessage = `Maximum ${maxLength} caractères`;
+        }
+
+        // Check pattern
+        if (!errorMessage && pattern && value && !new RegExp(pattern).test(value)) {
+            errorMessage = 'Format invalide';
+        }
+
         if (errorMessage) {
-            displayFieldError(field, errorMessage);
+            this.showFieldError(field, errorMessage);
             return false;
         } else {
-            displayFieldSuccess(field);
+            this.clearFieldError(field);
+            this.showFieldSuccess(field);
             return true;
         }
     }
 
-    function displayFieldError(field, message) {
-        // Ajouter la classe d'erreur
-        field.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
-        field.classList.remove('border-gray-300', 'focus:ring-blue-500', 'focus:border-blue-500', 'border-green-500', 'focus:ring-green-500', 'focus:border-green-500');
+    validateForm(form) {
+        const inputs = form.querySelectorAll('input, textarea, select');
+        let isValid = true;
 
-        // Créer ou mettre à jour le message d'erreur
-        let errorDiv = field.parentElement.querySelector('.text-red-600');
-        if (!errorDiv) {
-            errorDiv = document.createElement('p');
-            errorDiv.className = 'mt-2 text-sm text-red-600 flex items-center';
-            errorDiv.innerHTML = `
-                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18.101 12.93a1 1 0 00-1.414-1.414L10 15.586l-6.687-6.687a1 1 0 00-1.414 1.414l8.1 8.1a1 1 0 001.414 0l8.1-8.1z" clip-rule="evenodd" />
-                </svg>
-                <span>${message}</span>
-            `;
-            field.parentElement.appendChild(errorDiv);
-        } else {
-            errorDiv.querySelector('span').textContent = message;
-        }
+        inputs.forEach(input => {
+            if (input.type !== 'hidden' && input.type !== 'submit' && input.type !== 'button') {
+                if (!this.validateField(input)) {
+                    isValid = false;
+                }
+            }
+        });
+
+        return isValid;
     }
 
-    function displayFieldSuccess(field) {
+    showFieldError(field, message) {
+        // Update field styles
+        field.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500', 'bg-red-50');
+        field.classList.remove('border-green-500', 'border-gray-300', 'focus:ring-green-500', 'focus:border-green-500', 'focus:ring-blue-500', 'focus:border-blue-500', 'bg-white');
+
+        // Remove old error message
+        const oldError = field.parentElement.querySelector('.form-error-message');
+        if (oldError) oldError.remove();
+
+        // Add new error message
+        const errorDiv = document.createElement('p');
+        errorDiv.className = 'form-error-message text-red-600 text-sm mt-1 flex items-center gap-1';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+        field.parentElement.appendChild(errorDiv);
+    }
+
+    showFieldSuccess(field) {
+        // Update field styles
         field.classList.add('border-green-500', 'focus:ring-green-500', 'focus:border-green-500');
-        field.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500', 'border-gray-300', 'focus:ring-blue-500', 'focus:border-blue-500');
+        field.classList.remove('border-red-500', 'border-gray-300', 'focus:ring-red-500', 'focus:border-red-500', 'focus:ring-blue-500', 'focus:border-blue-500', 'bg-red-50');
 
-        // Supprimer le message d'erreur
-        removeFieldError(field);
+        // Remove error message if exists
+        const errorDiv = field.parentElement.querySelector('.form-error-message');
+        if (errorDiv) errorDiv.remove();
     }
 
-    function removeFieldError(field) {
-        const errorDiv = field.parentElement.querySelector('.text-red-600');
-        if (errorDiv) {
-            errorDiv.remove();
-        }
+    clearFieldError(field) {
+        field.classList.remove('border-red-500', 'border-green-500', 'focus:ring-red-500', 'focus:border-red-500', 'focus:ring-green-500', 'focus:border-green-500', 'bg-red-50');
+        field.classList.add('border-gray-300', 'focus:ring-blue-500', 'focus:border-blue-500');
+
+        const errorDiv = field.parentElement.querySelector('.form-error-message');
+        if (errorDiv) errorDiv.remove();
     }
 
-    function isValidEmail(email) {
+    // Validation utilities
+    isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
-    function isValidDate(date) {
-        return !isNaN(Date.parse(date));
+    isValidPhone(phone) {
+        return /^[\d\s\-\+\(\)]{10,}$/.test(phone);
     }
 
-    function showAlert(message, type = 'success') {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `fixed top-4 right-4 px-6 py-4 rounded-lg text-white font-medium shadow-lg z-50 ${
-            type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-        }`;
-        alertDiv.textContent = message;
+    isValidDate(date) {
+        return !isNaN(Date.parse(date)) && /^\d{4}-\d{2}-\d{2}/.test(date);
+    }
 
+    isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // Alert system
+    showAlert(message, type = 'success') {
+        const alertDiv = document.createElement('div');
+        const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+        const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+        
+        alertDiv.className = `fixed top-4 right-4 px-6 py-4 rounded-lg text-white font-medium shadow-lg z-50 ${bgColor} flex items-center gap-2`;
+        alertDiv.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
         document.body.appendChild(alertDiv);
 
-        // Animation d'apparition
+        // Show animation
         alertDiv.style.opacity = '0';
-        alertDiv.style.transition = 'opacity 0.3s ease';
-        setTimeout(() => alertDiv.style.opacity = '1', 10);
+        alertDiv.style.transform = 'translateX(400px)';
+        alertDiv.style.transition = 'all 0.3s ease';
+        setTimeout(() => {
+            alertDiv.style.opacity = '1';
+            alertDiv.style.transform = 'translateX(0)';
+        }, 10);
 
-        // Auto-suppression après 4 secondes
+        // Auto-remove after 4 seconds
         setTimeout(() => {
             alertDiv.style.opacity = '0';
+            alertDiv.style.transform = 'translateX(400px)';
             setTimeout(() => alertDiv.remove(), 300);
         }, 4000);
     }
+}
 
-    // Exposer showAlert pour utilisation externe
-    window.showAlert = showAlert;
-});
+// Initialize validator
+const formValidator = new FormValidator();
+
+// Expose for external use
+window.showAlert = (message, type = 'success') => formValidator.showAlert(message, type);
+window.validateField = (field) => formValidator.validateField(field);
+window.validateForm = (form) => formValidator.validateForm(form);

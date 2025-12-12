@@ -23,14 +23,18 @@ class ProfileController extends Controller
         $user = Auth::user();
         
         $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:100', 'regex:/^[a-zA-ZÀ-ÿ\s\'\-]+$/'],
+            'last_name' => ['required', 'string', 'max:100', 'regex:/^[a-zA-ZÀ-ÿ\s\'\-]+$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'birth_date' => ['nullable', 'date'],
-            'gender' => ['nullable', 'string', 'in:male,female,other'],
-            'address' => ['nullable', 'string', 'max:500'],
-            'emergency_contact' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\+\-\(\)]+$/'],
+            'birth_date' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(10)->toDateString(), 'after:1920-01-01'],
+            'address' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'first_name.regex' => 'Le prénom ne doit contenir que des lettres.',
+            'last_name.regex' => 'Le nom ne doit contenir que des lettres.',
+            'phone.regex' => 'Le téléphone doit être au format valide.',
+            'birth_date.before_or_equal' => 'L\'age minimum requis est 10 ans.',
+            'birth_date.after' => 'La date de naissance doit etre apres 1920.',
         ]);
 
         $user->update($validated);
@@ -49,7 +53,9 @@ class ProfileController extends Controller
     {
         $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
         ]);
 
         $user = Auth::user();
