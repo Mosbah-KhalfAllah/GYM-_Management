@@ -34,7 +34,6 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'birth_date' => 'date',
         'is_active' => 'boolean',
     ];

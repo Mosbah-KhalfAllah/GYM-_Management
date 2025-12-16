@@ -232,8 +232,7 @@ class DatabaseSeeder extends Seeder
                     'weight' => $exData['weight'],
                     'rest_seconds' => $exData['rest_seconds'],
                     'day_number' => ($index % 6) + 1,
-                    'video_url' => null,
-                    'image_path' => null,
+
                 ]);
             }
         }

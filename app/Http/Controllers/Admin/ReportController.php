@@ -4,113 +4,105 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Attendance;
-use App\Models\Membership;
 use App\Models\Payment;
-use App\Models\ClassModel;
+use App\Models\Attendance;
+use App\Models\Equipment;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
 class ReportController extends Controller
 {
     public function index()
     {
-        // Statistiques générales
-        $stats = [
-            'total_members' => User::where('role', 'member')->count(),
-            'active_members' => User::where('role', 'member')->where('is_active', true)->count(),
-            'new_members_this_month' => User::where('role', 'member')
-                ->whereMonth('created_at', now()->month)
-                ->count(),
-            'attendance_today' => Attendance::whereDate('check_in', today())->count(),
-            'attendance_this_month' => Attendance::whereMonth('check_in', now()->month)->count(),
-            'active_memberships' => Membership::where('status', 'active')->count(),
-            'monthly_revenue' => Payment::where('status', 'completed')
-                ->whereMonth('created_at', now()->month)
-                ->sum('amount'),
-            'total_classes' => ClassModel::count(),
-            'upcoming_classes' => ClassModel::where('schedule_time', '>', now())
-                ->where('status', 'scheduled')
-                ->count(),
-        ];
-
-        // Données pour les graphiques
-        $attendanceData = $this->getAttendanceChartData();
-        $revenueData = $this->getRevenueChartData();
-        $membershipData = $this->getMembershipChartData();
-
-        return view('admin.reports.index', compact('stats', 'attendanceData', 'revenueData', 'membershipData'));
+        return view('admin.reports.index');
     }
 
-    public function export(Request $request)
+    public function membersReport(Request $request)
     {
-        $type = $request->get('type', 'attendance');
-        $startDate = $request->get('start_date', now()->subMonth());
-        $endDate = $request->get('end_date', now());
+        $startDate = $request->get('start_date', now()->startOfMonth());
+        $endDate = $request->get('end_date', now()->endOfMonth());
+        
+        $members = User::where('role', 'member')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->with('membership')
+            ->get();
 
-        switch ($type) {
-            case 'attendance':
-                $data = Attendance::with('user')
-                    ->whereBetween('check_in', [$startDate, $endDate])
-                    ->get();
-                break;
-            case 'payments':
-                $data = Payment::with('user')
-                    ->whereBetween('created_at', [$startDate, $endDate])
-                    ->get();
-                break;
-            case 'members':
-                $data = User::where('role', 'member')
-                    ->whereBetween('created_at', [$startDate, $endDate])
-                    ->get();
-                break;
-            default:
-                $data = [];
+        if ($request->get('format') === 'pdf') {
+            $pdf = Pdf::loadView('admin.reports.members-pdf', compact('members', 'startDate', 'endDate'));
+            return $pdf->download('rapport-membres-' . now()->format('Y-m-d') . '.pdf');
         }
 
-        // En production, vous utiliseriez une librairie comme maatwebsite/excel
-        // Pour l'instant, on retourne une vue simple
-        return view('admin.reports.export', compact('data', 'type', 'startDate', 'endDate'));
+        return view('admin.reports.members', compact('members', 'startDate', 'endDate'));
     }
 
-    private function getAttendanceChartData()
+    public function paymentsReport(Request $request)
     {
-        $data = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
-            $count = Attendance::whereDate('check_in', $date)->count();
-            $data[] = [
-                'date' => $date->format('d/m'),
-                'count' => $count
-            ];
+        $startDate = $request->get('start_date', now()->startOfMonth());
+        $endDate = $request->get('end_date', now()->endOfMonth());
+        
+        $payments = Payment::whereBetween('created_at', [$startDate, $endDate])
+            ->with('user')
+            ->get();
+
+        $totalRevenue = $payments->sum('amount');
+        $paymentsByMethod = $payments->groupBy('payment_method');
+
+        if ($request->get('format') === 'pdf') {
+            $pdf = Pdf::loadView('admin.reports.payments-pdf', compact('payments', 'totalRevenue', 'paymentsByMethod', 'startDate', 'endDate'));
+            return $pdf->download('rapport-paiements-' . now()->format('Y-m-d') . '.pdf');
         }
-        return $data;
+
+        return view('admin.reports.payments', compact('payments', 'totalRevenue', 'paymentsByMethod', 'startDate', 'endDate'));
     }
 
-    private function getRevenueChartData()
+    public function attendanceReport(Request $request)
     {
-        $data = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $date = Carbon::now()->subMonths($i);
-            $revenue = Payment::whereYear('created_at', $date->year)
-                ->whereMonth('created_at', $date->month)
-                ->where('status', 'completed')
-                ->sum('amount');
-            $data[] = [
-                'month' => $date->format('M Y'),
-                'revenue' => $revenue
-            ];
+        $startDate = $request->get('start_date', now()->startOfMonth());
+        $endDate = $request->get('end_date', now()->endOfMonth());
+        
+        $attendances = Attendance::whereBetween('check_in', [$startDate, $endDate])
+            ->with('user')
+            ->get();
+
+        $dailyStats = $attendances->groupBy(function($attendance) {
+            return Carbon::parse($attendance->check_in)->format('Y-m-d');
+        });
+
+        if ($request->get('format') === 'pdf') {
+            $pdf = Pdf::loadView('admin.reports.attendance-pdf', compact('attendances', 'dailyStats', 'startDate', 'endDate'));
+            return $pdf->download('rapport-presences-' . now()->format('Y-m-d') . '.pdf');
         }
-        return $data;
+
+        return view('admin.reports.attendance', compact('attendances', 'dailyStats', 'startDate', 'endDate'));
     }
 
-    private function getMembershipChartData()
+    public function exportMembersExcel(Request $request)
     {
-        return [
-            'active' => Membership::where('status', 'active')->count(),
-            'expired' => Membership::where('status', 'expired')->count(),
-            'cancelled' => Membership::where('status', 'cancelled')->count(),
-            'pending' => Membership::where('status', 'pending')->count(),
-        ];
+        $startDate = $request->get('start_date', now()->startOfMonth());
+        $endDate = $request->get('end_date', now()->endOfMonth());
+        
+        $members = User::where('role', 'member')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->with('membership')
+            ->get();
+
+        $csvData = "Nom,Prénom,Email,Téléphone,Statut,Date d'inscription\n";
+        
+        foreach ($members as $member) {
+            $csvData .= sprintf(
+                "%s,%s,%s,%s,%s,%s\n",
+                $member->last_name,
+                $member->first_name,
+                $member->email,
+                $member->phone,
+                $member->membership->status ?? 'N/A',
+                $member->created_at->format('d/m/Y')
+            );
+        }
+
+        return response($csvData)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="membres-' . now()->format('Y-m-d') . '.csv"');
     }
 }

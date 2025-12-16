@@ -42,6 +42,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite('resources/js/form-validation.js')
+    <script src="{{ asset('js/advanced-validation.js') }}"></script>
     @yield('scripts')
 </body>
 </html>

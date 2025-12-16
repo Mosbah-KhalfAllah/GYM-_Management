@@ -71,43 +71,18 @@
                     </div>
                 </div>
                 <div class="relative">
-                    <div class="absolute inset-0 gradient-accent opacity-20 blob"></div>
-                    <div class="relative bg-white rounded-3xl shadow-2xl p-8">
-                        <div class="text-center mb-8">
-                            <div class="w-20 h-20 gradient-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-chart-line text-white text-3xl"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-900">Dashboard Admin</h3>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                        <i class="fas fa-users text-blue-600"></i>
-                                    </div>
-                                    <span class="font-medium text-gray-700">Membres actifs</span>
+                    <div class="w-full h-96 bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 rounded-3xl shadow-2xl overflow-hidden relative">
+                        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+                        <div class="relative h-full flex items-center justify-center">
+                            <div class="text-center text-white">
+                                <div class="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+                                    <i class="fas fa-dumbbell text-6xl"></i>
                                 </div>
-                                <span class="text-2xl font-bold text-gray-900">247</span>
-                            </div>
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                        <i class="fas fa-money-bill text-green-600"></i>
-                                    </div>
-                                    <span class="font-medium text-gray-700">Revenus mensuel</span>
-                                </div>
-                                <span class="text-2xl font-bold text-gray-900">12,450 DT</span>
-                            </div>
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                                        <i class="fas fa-calendar text-purple-600"></i>
-                                    </div>
-                                    <span class="font-medium text-gray-700">Cours aujourd'hui</span>
-                                </div>
-                                <span class="text-2xl font-bold text-gray-900">8</span>
+                                <h3 class="text-3xl font-bold mb-4">GYM PRO</h3>
+                                <p class="text-lg opacity-90">Solution Complète de Gestion</p>
                             </div>
                         </div>
+                        <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black to-transparent opacity-30"></div>
                     </div>
                 </div>
             </div>

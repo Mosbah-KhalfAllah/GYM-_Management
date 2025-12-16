@@ -85,7 +85,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     
     // Reports
     Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
-    Route::get('reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
+    Route::get('reports/members', [\App\Http\Controllers\Admin\ReportController::class, 'membersReport'])->name('reports.members');
+    Route::get('reports/payments', [\App\Http\Controllers\Admin\ReportController::class, 'paymentsReport'])->name('reports.payments');
+    Route::get('reports/attendance', [\App\Http\Controllers\Admin\ReportController::class, 'attendanceReport'])->name('reports.attendance');
+    Route::get('reports/members/excel', [\App\Http\Controllers\Admin\ReportController::class, 'exportMembersExcel'])->name('reports.members.excel');
     
     // Settings
     Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
