@@ -20,11 +20,12 @@ class ReportController extends Controller
 
     public function membersReport(Request $request)
     {
-        $startDate = $request->get('start_date', now()->startOfMonth());
-        $endDate = $request->get('end_date', now()->endOfMonth());
+        $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->get('end_date', now()->format('Y-m-d'));
         
+        // Récupérer tous les membres actifs au lieu de filtrer par date de création
         $members = User::where('role', 'member')
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('is_active', true)
             ->with('membership')
             ->get();
 

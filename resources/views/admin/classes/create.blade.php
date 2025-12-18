@@ -47,7 +47,7 @@
                     >
                         <option value="">Sélectionner un coach</option>
                         @foreach($coaches ?? [] as $coach)
-                            <option value="{{ $coach->id }}">{{ $coach->full_name }}</option>
+                            <option value="{{ $coach->id }}">{{ $coach->full_name }} - {{ $coach->phone ?? 'N/A' }}</option>
                         @endforeach
                     </x-form-field>
                     

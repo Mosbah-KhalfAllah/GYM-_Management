@@ -10,16 +10,23 @@ use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $attendances = Attendance::with('user')
-            ->latest()
-            ->paginate(20);
+        $query = Attendance::with(['user:id,first_name,last_name,email'])->latest();
+        $member = null;
+        
+        // Filtrer par membre si spécifié
+        if ($request->filled('member_id')) {
+            $query->where('user_id', $request->member_id);
+            $member = User::with('membership')->find($request->member_id);
+        }
+        
+        $attendances = $query->paginate(15);
         
         $todayCount = Attendance::whereDate('check_in', today())->count();
         $weekCount = Attendance::whereBetween('check_in', [now()->startOfWeek(), now()->endOfWeek()])->count();
         
-        return view('admin.attendance.index', compact('attendances', 'todayCount', 'weekCount'));
+        return view('admin.attendance.index', compact('attendances', 'todayCount', 'weekCount'))->with('member', $member ?? null);
     }
 
     public function showRecord()
@@ -29,6 +36,39 @@ class AttendanceController extends Controller
 
     public function record(Request $request)
     {
+        // Si member_id est fourni directement (depuis la page du membre)
+        if ($request->filled('member_id')) {
+            $user = User::find($request->member_id);
+            
+            if (!$user || $user->role !== 'member' || !$user->is_active) {
+                return back()->with('error', 'Membre non trouvé ou inactif');
+            }
+
+            // Vérifier s'il y a une présence active
+            $activeAttendance = Attendance::where('user_id', $user->id)
+                ->whereDate('check_in', today())
+                ->whereNull('check_out')
+                ->first();
+
+            if ($activeAttendance) {
+                // Check-out
+                $activeAttendance->update([
+                    'check_out' => now(),
+                    'duration_minutes' => $activeAttendance->check_in->diffInMinutes(now()),
+                ]);
+                return back()->with('success', 'Sortie enregistrée pour ' . $user->full_name);
+            } else {
+                // Check-in
+                Attendance::create([
+                    'user_id' => $user->id,
+                    'check_in' => now(),
+                    'entry_method' => 'manual',
+                ]);
+                return back()->with('success', 'Entrée enregistrée pour ' . $user->full_name);
+            }
+        }
+
+        // Code existant pour l'API
         $request->validate([
             'user_id' => 'required|integer|exists:users,id',
             'action' => 'required|in:check_in,check_out',
@@ -42,7 +82,6 @@ class AttendanceController extends Controller
             }
 
             if ($request->action === 'check_in') {
-                // Vérifier si l'utilisateur a déjà un check-in actif
                 $activeAttendance = Attendance::where('user_id', $user->id)
                     ->whereDate('check_in', today())
                     ->whereNull('check_out')
@@ -52,7 +91,6 @@ class AttendanceController extends Controller
                     return response()->json(['error' => 'Cet utilisateur a déjà une présence active'], 400);
                 }
 
-                // Créer un nouveau check-in
                 $attendance = Attendance::create([
                     'user_id' => $user->id,
                     'check_in' => now(),
@@ -66,7 +104,6 @@ class AttendanceController extends Controller
                     'check_in' => now()->format('H:i'),
                 ]);
             } else {
-                // Check-out
                 $activeAttendance = Attendance::where('user_id', $user->id)
                     ->whereDate('check_in', today())
                     ->whereNull('check_out')
@@ -101,7 +138,8 @@ class AttendanceController extends Controller
             return response()->json([]);
         }
 
-        $members = User::where('role', 'member')
+        $members = User::select('id', 'first_name', 'last_name', 'email')
+            ->where('role', 'member')
             ->where('is_active', true)
             ->where(function($q) use ($query) {
                 $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%$query%"])
@@ -109,7 +147,6 @@ class AttendanceController extends Controller
                   ->orWhere('first_name', 'like', "%$query%")
                   ->orWhere('last_name', 'like', "%$query%");
             })
-            ->select('id', 'first_name', 'last_name', 'email')
             ->limit(10)
             ->get();
 

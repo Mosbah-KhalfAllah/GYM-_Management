@@ -116,9 +116,18 @@ class ProgramController extends Controller
             'status' => 'active',
             'current_day' => 1,
             'completion_percentage' => 0,
+            'start_date' => now(),
+            'end_date' => now()->addDays($program->duration_days),
         ]);
         
         return redirect()->route('admin.members.show', $member->id)
             ->with('success', 'Programme assigné avec succès.');
+    }
+
+    public function unassignMember(WorkoutProgram $program, User $member)
+    {
+        $member->programs()->detach($program->id);
+        
+        return back()->with('success', 'Programme désassigné avec succès.');
     }
 }

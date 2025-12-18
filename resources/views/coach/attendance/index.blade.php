@@ -104,9 +104,9 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $attendance->entry_method === 'manual' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800' }}">
-                                        <i class="fas {{ $attendance->entry_method === 'manual' ? 'fa-hand-paper' : 'fa-qrcode' }} mr-1"></i>
-                                        {{ ucfirst(str_replace('_', ' ', $attendance->entry_method ?? 'unknown')) }}
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <i class="fas fa-hand-paper mr-1"></i>
+                                        Manuel
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">

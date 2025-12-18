@@ -151,9 +151,8 @@
                                     <div class="text-sm text-gray-500">{{ $attendance->check_in->format('d/m/Y') }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                        {{ $attendance->entry_method === 'qr_code' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
-                                        {{ $attendance->entry_method === 'qr_code' ? 'Scanner' : 'Manuel' }}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        Manuel
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -181,7 +180,7 @@
             </a>
             <a href="{{ route('admin.attendance.record') }}" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-4 flex flex-col items-center justify-center transition-all duration-200 transform hover:-translate-y-1">
                 <i class="fas fa-door-open text-2xl mb-2"></i>
-                <span class="font-medium">Scanner Présence</span>
+                <span class="font-medium">Enregistrer Présence</span>
             </a>
             <a href="{{ route('admin.classes.create') }}" class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-4 flex flex-col items-center justify-center transition-all duration-200 transform hover:-translate-y-1">
                 <i class="fas fa-calendar-plus text-2xl mb-2"></i>
@@ -229,7 +228,11 @@
                         drawBorder: false
                     },
                     ticks: {
-                        stepSize: 5
+                        stepSize: 1,
+                        precision: 0,
+                        callback: function(value) {
+                            return Math.floor(value);
+                        }
                     }
                 },
                 x: {
@@ -282,11 +285,25 @@
                     beginAtZero: true,
                     grid: {
                         drawBorder: false
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toFixed(2) + ' TND';
+                        }
                     }
                 },
                 x: {
                     grid: {
                         display: false
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Revenus: ' + context.parsed.y.toFixed(2) + ' TND';
+                        }
                     }
                 }
             }
@@ -323,6 +340,17 @@
             plugins: {
                 legend: {
                     position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return label + ': ' + value + ' (' + percentage + '%)';
+                        }
+                    }
                 }
             }
         }

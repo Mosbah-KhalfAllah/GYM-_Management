@@ -10,7 +10,7 @@ class ChallengeController extends Controller
 {
     public function index()
     {
-        $challenges = Challenge::latest()->paginate(10);
+        $challenges = Challenge::latest()->paginate(15);
         $activeChallenges = Challenge::where('is_active', true)->count();
         $completedChallenges = Challenge::where('end_date', '<', now())->count();
         

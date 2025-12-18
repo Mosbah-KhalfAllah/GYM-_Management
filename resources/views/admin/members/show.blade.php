@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.attendance.index') }}" class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center gap-2">
+            <a href="{{ route('admin.attendance.index', ['member_id' => $member->id]) }}" class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center gap-2">
                 <i class="fas fa-door-open"></i>
                 Présences
             </a>
@@ -26,14 +26,25 @@
                 <i class="fas fa-edit"></i>
                 Modifier
             </a>
-            <form action="{{ route('admin.members.destroy', $member) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir désactiver ce membre ?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 flex items-center gap-2">
-                    <i class="fas fa-user-slash"></i>
-                    Désactiver
-                </button>
-            </form>
+            @if($member->is_active)
+                <form action="{{ route('admin.members.destroy', $member) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir désactiver ce membre ?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 flex items-center gap-2">
+                        <i class="fas fa-user-slash"></i>
+                        Désactiver
+                    </button>
+                </form>
+            @else
+                <form action="{{ route('admin.members.activate', $member) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir activer ce membre ?');">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center gap-2">
+                        <i class="fas fa-user-check"></i>
+                        Activer
+                    </button>
+                </form>
+            @endif
         </div>
     </div>
 
@@ -218,10 +229,14 @@
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Actions rapides</h2>
                 <div class="space-y-3">
-                    <a href="{{ route('admin.attendance.record', ['member_id' => $member->id]) }}" class="block w-full px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-center font-medium">
-                        <i class="fas fa-door-open mr-2"></i>
-                        Enregistrer présence
-                    </a>
+                    <form action="{{ route('admin.attendance.record') }}" method="POST" class="block w-full">
+                        @csrf
+                        <input type="hidden" name="member_id" value="{{ $member->id }}">
+                        <button type="submit" class="w-full px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium">
+                            <i class="fas fa-door-open mr-2"></i>
+                            Enregistrer présence
+                        </button>
+                    </form>
                     <a href="{{ route('admin.payments.create') }}?member_id={{ $member->id }}" class="block w-full px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-center font-medium">
                         <i class="fas fa-credit-card mr-2"></i>
                         Enregistrer paiement

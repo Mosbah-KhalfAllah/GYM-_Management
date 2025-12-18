@@ -113,17 +113,6 @@ class MemberController extends Controller
             'is_active' => true,
         ]);
 
-        // Create default membership
-        Membership::create([
-            'user_id' => $user->id,
-            'type' => 'Mensuel',
-            'price' => 30,
-            'start_date' => now(),
-            'end_date' => now()->addMonth(),
-            'status' => 'active',
-            'auto_renewal' => true,
-        ]);
-
         return redirect()->route('admin.members.index')
             ->with('success', 'Membre créé avec succès.');
     }
@@ -213,8 +202,21 @@ class MemberController extends Controller
         // Soft delete or full delete based on your needs
         $member->update(['is_active' => false]);
 
-        return redirect()->route('admin.members.index')
-            ->with('success', 'Membre désactivé avec succès.');
+        return back()->with('success', 'Membre désactivé avec succès.');
+    }
+
+    /**
+     * Activate the specified member.
+     */
+    public function activate(User $member)
+    {
+        if ($member->role !== 'member') {
+            abort(404);
+        }
+
+        $member->update(['is_active' => true]);
+
+        return back()->with('success', 'Membre activé avec succès.');
     }
 
     /**
@@ -237,8 +239,13 @@ class MemberController extends Controller
         $phone = $request->input('phone');
         
         $member = User::where('role', 'member')
-            ->where('phone', $phone)
             ->where('is_active', true)
+            ->where(function($query) use ($phone) {
+                $query->where('phone', $phone)
+                      ->orWhere('emergency_contact', $phone)
+                      ->orWhere('phone', 'like', '%' . $phone . '%')
+                      ->orWhere('emergency_contact', 'like', '%' . $phone . '%');
+            })
             ->first();
             
         if ($member) {

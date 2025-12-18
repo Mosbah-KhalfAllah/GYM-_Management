@@ -14,14 +14,27 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
             <h2 class="text-lg font-bold mb-4">🔍 Sélectionner un membre</h2>
             
-            <div class="relative mb-4">
-                <input 
-                    type="text" 
-                    id="memberSearch" 
-                    placeholder="Chercher un membre par nom ou email..." 
-                    class="w-full border rounded-lg p-3 focus:outline-none focus:border-blue-500"
-                >
-                <div id="searchResults" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 max-h-64 overflow-y-auto z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="memberSearch" 
+                        placeholder="Chercher par nom ou email..." 
+                        class="w-full border rounded-lg p-3 focus:outline-none focus:border-blue-500"
+                    >
+                    <div id="searchResults" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 max-h-64 overflow-y-auto z-10">
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <input 
+                        type="text" 
+                        id="phoneSearch" 
+                        placeholder="Numéro de téléphone" 
+                        class="flex-1 border rounded-lg p-3 focus:outline-none focus:border-green-500"
+                    >
+                    <button onclick="searchByPhone()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
             </div>
 
@@ -156,6 +169,7 @@ let membersList = [];
 // Charger la liste des membres
 async function loadMembers() {
     const searchInput = document.getElementById('memberSearch');
+    const phoneInput = document.getElementById('phoneSearch');
     
     searchInput.addEventListener('input', async function(e) {
         const query = e.target.value.toLowerCase().trim();
@@ -173,6 +187,43 @@ async function loadMembers() {
             displaySearchResults([]);
         }
     });
+    
+    phoneInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchByPhone();
+        }
+    });
+}
+
+async function searchByPhone() {
+    const phone = document.getElementById('phoneSearch').value.trim();
+    if (!phone) {
+        showError('Veuillez saisir un numéro de téléphone');
+        return;
+    }
+    
+    try {
+        const response = await fetch('{{ route("admin.members.search-by-phone") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ phone: phone })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            selectMember(result.member.id, result.member.name);
+            document.getElementById('phoneSearch').value = '';
+        } else {
+            showError(result.message || 'Membre non trouvé');
+        }
+    } catch (error) {
+        showError('Erreur lors de la recherche: ' + error.message);
+        console.error('Error:', error);
+    }
 }
 
 function displaySearchResults(members) {

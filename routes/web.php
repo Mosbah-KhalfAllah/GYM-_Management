@@ -51,6 +51,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('members/{member}/attendance', [\App\Http\Controllers\Admin\MemberController::class, 'generateQrCode'])->name('members.attendance');
     Route::get('members/{member}/quick-payment', [\App\Http\Controllers\Admin\PaymentController::class, 'create'])->name('members.quick-payment');
     Route::post('members/search-by-phone', [\App\Http\Controllers\Admin\MemberController::class, 'searchByPhone'])->name('members.search-by-phone');
+    Route::patch('members/{member}/activate', [\App\Http\Controllers\Admin\MemberController::class, 'activate'])->name('members.activate');
     
     // Coaches
     Route::resource('coaches', \App\Http\Controllers\Admin\CoachController::class);
@@ -59,6 +60,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::resource('programs', \App\Http\Controllers\Admin\ProgramController::class);
     Route::get('members/{member}/assign-program', [\App\Http\Controllers\Admin\ProgramController::class, 'assignMemberForm'])->name('programs.assignMemberForm');
     Route::post('members/{member}/assign-program', [\App\Http\Controllers\Admin\ProgramController::class, 'assignMember'])->name('programs.assignMember');
+    Route::delete('programs/{program}/unassign/{member}', [\App\Http\Controllers\Admin\ProgramController::class, 'unassignMember'])->name('programs.unassignMember');
     
     // Classes
     Route::resource('classes', \App\Http\Controllers\Admin\ClassController::class);

@@ -11,7 +11,7 @@ class ClassController extends Controller
 {
     public function index()
     {
-        $classes = ClassModel::with('coach')->latest()->paginate(10);
+        $classes = ClassModel::with('coach')->latest()->paginate(15);
         return view('admin.classes.index', compact('classes'));
     }
 

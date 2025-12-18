@@ -80,32 +80,32 @@
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('coach.members.index') }}" class="sidebar-link {{ request()->routeIs('coach.members.*') ? 'active' : '' }}">
                     <i class="fas fa-users"></i>
                     <span>Mes Membres</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('coach.programs.index') }}" class="sidebar-link {{ request()->routeIs('coach.programs.*') ? 'active' : '' }}">
                     <i class="fas fa-clipboard-list"></i>
                     <span>Programmes</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('coach.exercises.index') }}" class="sidebar-link {{ request()->routeIs('coach.exercises.*') ? 'active' : '' }}">
                     <i class="fas fa-dumbbell"></i>
                     <span>Exercices</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('coach.classes.index') }}" class="sidebar-link {{ request()->routeIs('coach.classes.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Mes Cours</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('coach.schedule.index') }}" class="sidebar-link {{ request()->routeIs('coach.schedule.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar"></i>
                     <span>Planning</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('coach.attendance.index') }}" class="sidebar-link {{ request()->routeIs('coach.attendance.*') ? 'active' : '' }}">
                     <i class="fas fa-clock"></i>
                     <span>Présences</span>
@@ -119,32 +119,32 @@
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('member.program.index') }}" class="sidebar-link {{ request()->routeIs('member.program.*') ? 'active' : '' }}">
                     <i class="fas fa-clipboard-list"></i>
                     <span>Mon Programme</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('member.classes.index') }}" class="sidebar-link {{ request()->routeIs('member.classes.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Cours</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('member.challenges.index') }}" class="sidebar-link {{ request()->routeIs('member.challenges.*') ? 'active' : '' }}">
                     <i class="fas fa-trophy"></i>
                     <span>Défis</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('member.attendance.index') }}" class="sidebar-link {{ request()->routeIs('member.attendance.*') ? 'active' : '' }}">
                     <i class="fas fa-clock"></i>
                     <span>Mes Présences</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('member.payments.index') }}" class="sidebar-link {{ request()->routeIs('member.payments.*') ? 'active' : '' }}">
                     <i class="fas fa-credit-card"></i>
                     <span>Paiements</span>
                 </a>
-                
+                <br>
                 <a href="{{ route('member.progress.index') }}" class="sidebar-link {{ request()->routeIs('member.progress.*') ? 'active' : '' }}">
                     <i class="fas fa-chart-line"></i>
                     <span>Progrès</span>

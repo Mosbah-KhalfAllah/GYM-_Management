@@ -12,7 +12,7 @@ class EquipmentController extends Controller
 {
     public function index()
     {
-        $equipment = Equipment::with('assignedUser')->latest()->paginate(10);
+        $equipment = Equipment::with('assignedUser')->latest()->paginate(15);
         $availableCount = Equipment::where('status', 'available')->count();
         $maintenanceCount = Equipment::where('status', 'maintenance')->count();
         $brokenCount = Equipment::where('status', 'broken')->count();
